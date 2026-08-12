@@ -1,0 +1,13 @@
+{
+  "user_input": "Status?",
+  "final_output": "It shipped.",
+  "llm_calls": [
+    {
+      "tool_calls_json": [{"name": "get_order", "args": {"order_id": "ORD-1"}}],
+      "latency_ms": 400
+    }
+  ],
+  "spans": [
+    {"span_type": "tool", "name": "get_order", "output_preview": "{\"status\":\"shipped\",\"carrier\":\"UPS\"}"}
+  ]
+}

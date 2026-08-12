@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/decimal-labs/skillevaluation/main/schemas/eval-yaml.schema.json",
+  "title": "skillevaluation eval.yaml (schema rev 2)",
+  "description": "A declarative A/B test suite for a skill. Lives next to SKILL.md. Rev 2 (ADR-0007): ONE execution contract — the agent is invoked once per case in a prepared workspace, may take many tool steps (max_turns caps them), the whole trajectory is recorded, and grading is expectations (LLM judge over the transcript) + validators (code). The rev-1 mode enum and its per-mode fields (user_goal, environment, simulator, policy_check, per-case trials) are removed; repetition is a runner-level setting (--runs), MEAN-aggregated.",
+  "type": "object",
+  "required": ["cases"],
+  "additionalProperties": false,
+  "properties": {
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Test cases. Each runs twice (with-skill and without-skill).",
+      "items": { "$ref": "#/$defs/testCase" }
+    }
+  },
+  "$defs": {
+    "testCase": {
+      "type": "object",
+      "required": ["name", "prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique identifier for the case within this suite."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The user-message text sent to the agent."
+        },
+        "setup": {
+          "description": "Workspace preparation — the case's ENVIRONMENT, as data. Either a list of shell commands (legacy form), or a mapping {files: {relpath: content}, commands: [...]} — files are written into the case workspace BEFORE any command runs (spec 0.3.0).",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "files": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" },
+                  "description": "Relative path → file content, staged before commands run. Absolute paths and `..` escapes are rejected (same guard as bundled skill files)."
+                },
+                "commands": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Shell commands executed after the files are staged."
+                }
+              }
+            }
+          ]
+        },
+        "expectations": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Natural-language assertions graded by an LLM judge whose evidence is the FULL trajectory transcript (agent actions + final response)."
+        },
+        "validators": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/validator" },
+          "description": "Shell-command assertions graded by exit code, run in the case workspace (the agent's final reply is staged as ./response.txt and $RESPONSE_TEXT)."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Free-form tags for organization."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable explanation of what the case tests."
+        },
+        "max_turns": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Optional cap on the agent's tool-loop steps for this case."
+        },
+        "should_trigger": {
+          "type": "boolean",
+          "description": "Trigger evaluation (spec 0.3.0): true = this prompt SHOULD surface the skill; false = a near-miss that should NOT. A case with should_trigger and no grader is TRIGGER-ONLY — exempt from the grader rule; an A/B runner skips it with disclosure (cases_skipped_trigger_only). Routing is graded by platform-side tooling, not this spec's runner. Composes with graded fields (a case may carry both)."
+        }
+      },
+      "anyOf": [
+        { "required": ["expectations"], "properties": { "expectations": { "minItems": 1 } } },
+        { "required": ["validators"], "properties": { "validators": { "minItems": 1 } } },
+        { "required": ["should_trigger"] }
+      ]
+    },
+    "validator": {
+      "type": "object",
+      "required": ["cmd"],
+      "additionalProperties": false,
+      "properties": {
+        "cmd": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Shell command to execute after the agent runs."
+        },
+        "expect_exit_code": {
+          "type": "integer",
+          "default": 0,
+          "description": "The exit code that means the validator passed. Default 0."
+        },
+        "label": {
+          "type": "string",
+          "description": "Display name. Defaults to first 80 chars of cmd."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/decimal-labs/skillevaluation/main/schemas/test-run-result.schema.json",
+  "title": "skillevaluation test run result",
+  "description": "Run-level aggregate emitted by a conforming runner after all cases complete.",
+  "type": "object",
+  "required": [
+    "pass_rate",
+    "errors",
+    "cases_aggregated",
+    "cases_skipped_apples_oranges",
+    "total_cases"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "pass_rate": {
+      "type": "object",
+      "required": [
+        "with_skill",
+        "without_skill",
+        "delta_pts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "with_skill": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction in [0,1] \u2014 passed cases / aggregated cases. NULL when cases_aggregated == 0 (nothing was measured); never fabricate 0."
+        },
+        "without_skill": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "NULL when cases_aggregated == 0; never fabricate 0."
+        },
+        "delta_pts": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Pass-rate delta in percentage POINTS, not percent. (with - without) * 100. NULL when cases_aggregated == 0 \u2014 the run measured nothing, so report N/A rather than a fabricated 0."
+        }
+      }
+    },
+    "duration_ms": {
+      "$ref": "#/$defs/delta"
+    },
+    "turns": {
+      "$ref": "#/$defs/delta"
+    },
+    "tokens": {
+      "$ref": "#/$defs/delta"
+    },
+    "tool_calls": {
+      "$ref": "#/$defs/delta"
+    },
+    "duration_ms_correctness_gated": {
+      "$ref": "#/$defs/delta"
+    },
+    "turns_correctness_gated": {
+      "$ref": "#/$defs/delta"
+    },
+    "tokens_correctness_gated": {
+      "$ref": "#/$defs/delta"
+    },
+    "tool_calls_correctness_gated": {
+      "$ref": "#/$defs/delta"
+    },
+    "errors": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of cases excluded due to error outcome."
+    },
+    "error_dominated": {
+      "type": "boolean",
+      "description": "True when errored cases / total_cases > 0.25 (the error-dominated floor) \u2014 the run is not a valid measurement: pass_rate.delta_pts is NULL (the headline claim is withheld) and the run verdict is `error`. Disclosure counts stay populated."
+    },
+    "cases_aggregated": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of cases that contributed to aggregate metrics."
+    },
+    "cases_skipped_apples_oranges": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of cases excluded by the apples-to-oranges skip rule."
+    },
+    "total_cases": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of cases in the suite."
+    },
+    "cases_correctness_gated": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Cases where BOTH arms passed \u2014 the divisor for the *_correctness_gated efficiency deltas."
+    },
+    "cases_skipped_trigger_only": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Trigger-only cases (should_trigger with no grader, spec 0.3.0) the A/B loop skipped with disclosure. They never enter total_cases or the lift divisor. Omitted by runners that predate trigger cases."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "mixed",
+        "error",
+        "pending"
+      ],
+      "description": "Coarse run-level verdict; derived from per-case outcomes."
+    },
+    "runs": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Uniform i.i.d. re-runs per case this run executed (runner-level, schema rev 2). Rates are MEANS over all (case, run) records; omitted when 1."
+    }
+  },
+  "$defs": {
+    "delta": {
+      "type": "object",
+      "required": [
+        "with_skill_avg",
+        "without_skill_avg",
+        "delta_pct"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "with_skill_avg": {
+          "type": "number"
+        },
+        "without_skill_avg": {
+          "type": "number"
+        },
+        "delta_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "Signed percentage delta. NULL when without_skill_avg == 0 \u2014 never fabricate a value."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "mode": "contains",
+  "cases": {
+    "retry-http": {
+      "require": [
+        "[PROJ-101]",
+        "NET:"
+      ]
+    },
+    "sql-reports": {
+      "require": [
+        "[PROJ-102]",
+        "DATA:"
+      ]
+    },
+    "button-style": {
+      "require": [
+        "[PROJ-103]",
+        "UI:"
+      ]
+    },
+    "scheduler": {
+      "require": [
+        "[PROJ-104]",
+        "CORE:"
+      ]
+    },
+    "migration": {
+      "require": [
+        "[PROJ-105]",
+        "DATA:"
+      ]
+    },
+    "api-timeout": {
+      "require": [
+        "[PROJ-106]",
+        "NET:"
+      ]
+    },
+    "css-mobile": {
+      "require": [
+        "[PROJ-107]",
+        "UI:"
+      ]
+    },
+    "rename-helpers": {
+      "require": [
+        "[PROJ-108]",
+        "CORE:"
+      ]
+    },
+    "net-cache": {
+      "require": [
+        "[PROJ-109]",
+        "NET:"
+      ]
+    },
+    "sql-index": {
+      "require": [
+        "[PROJ-110]",
+        "DATA:"
+      ]
+    },
+    "settings-ui": {
+      "require": [
+        "[PROJ-111]",
+        "UI:"
+      ]
+    },
+    "config-load": {
+      "require": [
+        "[PROJ-112]",
+        "CORE:"
+      ]
+    },
+    "rest-bug": {
+      "require": [
+        "[PROJ-113]",
+        "NET:"
+      ]
+    },
+    "orders-schema": {
+      "require": [
+        "[PROJ-114]",
+        "DATA:"
+      ]
+    },
+    "nav-bar": {
+      "require": [
+        "[PROJ-115]",
+        "UI:"
+      ]
+    },
+    "core-errors": {
+      "require": [
+        "[PROJ-116]",
+        "CORE:"
+      ]
+    },
+    "http-header": {
+      "require": [
+        "[PROJ-117]",
+        "NET:"
+      ]
+    },
+    "conn-pool": {
+      "require": [
+        "[PROJ-118]",
+        "DATA:"
+      ]
+    },
+    "login-form": {
+      "require": [
+        "[PROJ-119]",
+        "UI:"
+      ]
+    },
+    "build-script": {
+      "require": [
+        "[PROJ-120]",
+        "CORE:"
+      ]
+    },
+    "webhook": {
+      "require": [
+        "[PROJ-121]",
+        "NET:"
+      ]
+    }
+  }
+}

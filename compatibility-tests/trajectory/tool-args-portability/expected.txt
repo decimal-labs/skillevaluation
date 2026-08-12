@@ -1,0 +1,2 @@
+[Step 1] User: search please
+[Step 2] Agent → tool: search(flags=["x", "y"], filter={"a": 1, "b": 2}, temp=1.0, count=5, q="café")

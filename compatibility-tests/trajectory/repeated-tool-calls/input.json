@@ -1,0 +1,18 @@
+{
+  "user_input": "Compare orders ORD-1 and ORD-2",
+  "final_output": "ORD-1 shipped; ORD-2 is still pending.",
+  "llm_calls": [
+    {
+      "tool_calls_json": [{"name": "get_order", "args": {"order_id": "ORD-1"}}],
+      "latency_ms": 300
+    },
+    {
+      "tool_calls_json": [{"name": "get_order", "args": {"order_id": "ORD-2"}}],
+      "latency_ms": 250
+    }
+  ],
+  "spans": [
+    {"span_type": "tool", "name": "get_order", "output_preview": "{\"id\":\"ORD-1\",\"status\":\"shipped\"}"},
+    {"span_type": "tool", "name": "get_order", "output_preview": "{\"id\":\"ORD-2\",\"status\":\"pending\"}"}
+  ]
+}

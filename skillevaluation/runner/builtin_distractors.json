@@ -1,0 +1,38 @@
+[
+  {
+    "name": "api-pagination-conventions",
+    "description": "Apply cursor-based pagination conventions when designing or reviewing REST API list endpoints: page tokens, limits, and stable ordering."
+  },
+  {
+    "name": "changelog-writer",
+    "description": "Write and update CHANGELOG entries following Keep a Changelog: classify changes as Added/Changed/Fixed and maintain an Unreleased section."
+  },
+  {
+    "name": "csv-data-cleaning",
+    "description": "Clean tabular CSV data before analysis: normalize headers, coerce column types, handle missing values, and document every transformation applied."
+  },
+  {
+    "name": "dockerfile-hardening",
+    "description": "Harden Dockerfiles for production: pinned base images, non-root users, multi-stage builds, and minimal final layers."
+  },
+  {
+    "name": "email-tone-professional",
+    "description": "Rewrite outgoing business email drafts in a concise professional tone, preserving intent while removing filler and hedging."
+  },
+  {
+    "name": "git-branch-naming",
+    "description": "Name git branches by the team convention: type/scope-short-description, lowercase, hyphen-separated, linked to a tracker id."
+  },
+  {
+    "name": "regex-explainer",
+    "description": "Explain regular expressions token by token and propose safer, more readable alternatives for complex patterns."
+  },
+  {
+    "name": "sql-query-review",
+    "description": "Review SQL queries for correctness and performance: index usage, join order, N+1 patterns, and safe parameterization."
+  },
+  {
+    "name": "unit-test-naming",
+    "description": "Name and structure unit tests by the arrange-act-assert convention with behavior-describing test names."
+  }
+]

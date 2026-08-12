@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/decimal-labs/skillevaluation/main/schemas/test-case-result.schema.json",
+  "title": "skillevaluation test case result",
+  "description": "Per-case A/B result emitted by a conforming runner.",
+  "type": "object",
+  "required": ["case_name", "outcome"],
+  "additionalProperties": true,
+  "properties": {
+    "case_name": {
+      "type": "string",
+      "description": "Echo of the case's `name` from eval.yaml."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["flip_to_pass", "pass_kept", "fail_kept", "flip_to_fail", "error"],
+      "description": "Per-case outcome. See spec/runner-contract.md."
+    },
+    "with_skill": { "$ref": "#/$defs/armMetrics" },
+    "without_skill": { "$ref": "#/$defs/armMetrics" },
+    "expectation_results": {
+      "type": "array",
+      "comment": "Inlined as #/$defs/judgeResult so a naive jsonschema.validate resolves OFFLINE: resolving judge-result.schema.json by its absolute $id would need a network fetch, and would pull whatever is on the default branch rather than the version in hand. The standalone judge-result schema stays canonical for consumers that load it by $id (resources.build_registry()).",
+      "items": { "$ref": "#/$defs/judgeResult" }
+    },
+    "validator_results": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/validatorResult" }
+    }
+  },
+  "$defs": {
+    "judgeResult": {
+      "$comment": "Mirror of judge-result.schema.json (kept in sync) — inlined for offline validation.",
+      "type": "object",
+      "required": ["expectation", "passed", "reason"],
+      "additionalProperties": true,
+      "properties": {
+        "expectation": { "type": "string", "description": "Echo of the expectation text being graded." },
+        "passed": { "type": "boolean", "description": "Did the agent's response satisfy this expectation?" },
+        "reason": { "type": "string", "minLength": 1, "description": "1–3 sentence prose explanation grounded in observable agent behavior." },
+        "score": { "type": "number", "minimum": 0, "maximum": 1, "description": "Optional confidence in `passed`." }
+      }
+    },
+    "armMetrics": {
+      "type": "object",
+      "required": ["passed", "task_attempted", "errored"],
+      "additionalProperties": true,
+      "properties": {
+        "passed": {
+          "type": "boolean",
+          "description": "All assertions passed for this arm."
+        },
+        "task_attempted": {
+          "type": "boolean",
+          "description": "Did the agent meaningfully engage with the task? Drives the apples-to-oranges skip rule."
+        },
+        "errored": {
+          "type": "boolean",
+          "description": "Did this arm fail to execute (transient API failure, sandbox crash)?"
+        },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "turns": { "type": "integer", "minimum": 0 },
+        "total_tokens": { "type": "integer", "minimum": 0 },
+        "tool_call_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "validatorResult": {
+      "type": "object",
+      "required": ["label", "passed"],
+      "additionalProperties": true,
+      "properties": {
+        "label": { "type": "string" },
+        "passed": { "type": "boolean" },
+        "exit_code": { "type": "integer" },
+        "expect_exit_code": { "type": "integer" },
+        "stdout": { "type": "string" },
+        "stderr": { "type": "string" },
+        "errored": {
+          "type": "boolean",
+          "description": "True when the validator produced no verdict — the grader broke (non-binary undeclared exit code), timed out, or could not be spawned. The check is UNGRADED, not failed. Runners MUST roll this up into the arm's `errored` flag so the case classifies as outcome 'error' and is excluded from aggregate lift. See spec/runner-contract.md."
+        }
+      }
+    }
+  }
+}

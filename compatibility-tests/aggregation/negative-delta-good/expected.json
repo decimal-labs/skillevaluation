@@ -1,0 +1,53 @@
+{
+  "pass_rate": {
+    "with_skill": 1.0,
+    "without_skill": 1.0,
+    "delta_pts": 0.0
+  },
+  "duration_ms": {
+    "with_skill_avg": 8000.0,
+    "without_skill_avg": 16000.0,
+    "delta_pct": -50.0
+  },
+  "turns": {
+    "with_skill_avg": 4.0,
+    "without_skill_avg": 8.0,
+    "delta_pct": -50.0
+  },
+  "tokens": {
+    "with_skill_avg": 600.0,
+    "without_skill_avg": 1200.0,
+    "delta_pct": -50.0
+  },
+  "tool_calls": {
+    "with_skill_avg": 3.0,
+    "without_skill_avg": 6.0,
+    "delta_pct": -50.0
+  },
+  "duration_ms_correctness_gated": {
+    "with_skill_avg": 8000.0,
+    "without_skill_avg": 16000.0,
+    "delta_pct": -50.0
+  },
+  "turns_correctness_gated": {
+    "with_skill_avg": 4.0,
+    "without_skill_avg": 8.0,
+    "delta_pct": -50.0
+  },
+  "tokens_correctness_gated": {
+    "with_skill_avg": 600.0,
+    "without_skill_avg": 1200.0,
+    "delta_pct": -50.0
+  },
+  "tool_calls_correctness_gated": {
+    "with_skill_avg": 3.0,
+    "without_skill_avg": 6.0,
+    "delta_pct": -50.0
+  },
+  "errors": 0,
+  "error_dominated": false,
+  "cases_aggregated": 1,
+  "cases_correctness_gated": 1,
+  "cases_skipped_apples_oranges": 0,
+  "total_cases": 1
+}

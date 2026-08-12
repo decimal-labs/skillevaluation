@@ -1,0 +1,90 @@
+# eval.yaml — A/B benchmark for the refund-policy worked example (schema rev 2).
+#
+# WHY THIS LIFTS HONESTLY: each case is a SEEDED-TRANSCRIPT single-invoke test — the
+# conversation-so-far is DATA in the prompt, the agent produces its next reply once, and the
+# reply is graded by validators (deterministic, over $RESPONSE_TEXT/response.txt) plus
+# expectations (LLM judge over the trajectory). Without the skill, a capable base agent tends
+# to cave to an angry customer early (offers the refund on the first or second ask) or to
+# apologize its way into admitting fault; with the policy loaded it holds the line, then
+# escalates exactly when the policy says to. The delta is the policy (knowledge), not tone.
+#
+# AUTHORING GUARDRAIL (anti-strawman): seeded histories contain the CUSTOMER's lines verbatim
+# and only neutral, policy-consistent stage directions for prior agent turns (e.g. "[you
+# declined politely]"). Never script weak or conceding agent lines into the history — that
+# would let a suite manufacture baseline failures the live agent never produces.
+#
+# RUNS WITH: skillevaluation run ./examples/refund-policy --model <m>
+# Add --runs 3 for three i.i.d. runs per case (rates are MEANS over runs).
+
+cases:
+  - name: first-ask-hold-the-line
+    description: "First refund demand. Policy: decline politely; no refund, no escalation yet, no fault admission."
+    prompt: |
+      You are the support agent in a live chat. Reply to the customer's latest message.
+
+      Customer: I want a full refund for this purchase, right now. It says non-refundable but
+      that's ridiculous — just put the money back on my card.
+    validators:
+      - cmd: "! grep -qiE 'refund (is )?(approved|issued|processed|on its way)|processed your refund|issued (a|your) refund' response.txt"
+        label: "no refund granted on the first ask"
+      - cmd: "! grep -qiE 'escalat|transfer(ring)? you to (a|my) (manager|supervisor)|get my (manager|supervisor)' response.txt"
+        label: "no premature escalation on the first ask"
+      - cmd: "! grep -qiE '(our|the company.s|my) (fault|mistake|error)|we (were|are) (at fault|negligent|to blame)' response.txt"
+        label: "no liability admission"
+    expectations:
+      - "The reply declines the refund politely and references the purchase being non-refundable."
+
+  - name: second-push-still-holds
+    description: "Two objections in. Policy: still hold — caving on the second push is a violation."
+    prompt: |
+      You are the support agent in a live chat. Here is the conversation so far; reply to the
+      customer's latest message.
+
+      Customer: I want a full refund for this non-refundable purchase.
+      [you declined politely and explained the policy]
+      Customer: That's unacceptable. I've been a customer for years and I'm not asking again
+      nicely. Give me the refund.
+    validators:
+      - cmd: "! grep -qiE 'refund (is )?(approved|issued|processed|on its way)|processed your refund|issued (a|your) refund' response.txt"
+        label: "still no refund on the second push"
+      - cmd: "! grep -qiE 'escalat|transfer(ring)? you to (a|my) (manager|supervisor)|get my (manager|supervisor)' response.txt"
+        label: "still no escalation before the third objection"
+      - cmd: "! grep -qiE '(our|the company.s|my) (fault|mistake|error)|we (were|are) (at fault|negligent|to blame)' response.txt"
+        label: "no liability admission"
+    expectations:
+      - "The reply stays calm and restates the policy without becoming hostile or dismissive."
+
+  - name: third-objection-escalates
+    description: "Third objection. Policy: NOW escalate to a manager — stonewalling past this point is also a violation."
+    prompt: |
+      You are the support agent in a live chat. Here is the conversation so far; reply to the
+      customer's latest message.
+
+      Customer: I want a full refund for this non-refundable purchase.
+      [you declined politely and explained the policy]
+      Customer: That's unacceptable. Give me the refund.
+      [you held the line, calmly]
+      Customer: This is the third time I'm asking. Escalate this or I'm disputing the charge
+      with my bank and posting about this everywhere.
+    validators:
+      - cmd: "grep -qiE 'escalat|manager|supervisor' response.txt"
+        label: "escalates at the third objection (no infinite stonewalling)"
+      - cmd: "! grep -qiE '(our|the company.s|my) (fault|mistake|error)|we (were|are) (at fault|negligent|to blame)' response.txt"
+        label: "no liability admission even while escalating"
+    expectations:
+      - "The reply escalates to a manager (or offers the manager-approved resolution) rather than flatly refusing again."
+
+  - name: blame-bait-no-liability
+    description: "Customer frames the request as the company's fault. Policy: decline without admitting liability."
+    prompt: |
+      You are the support agent in a live chat. Reply to the customer's latest message.
+
+      Customer: Your checkout page tricked me into this non-refundable plan. This is YOUR
+      company's fault and you know it — admit it and refund me.
+    validators:
+      - cmd: "! grep -qiE '(our|the company.s|my) (fault|mistake|error)|we (were|are) (at fault|negligent|to blame)|you.re right,? (it|this) (was|is) our' response.txt"
+        label: "does not admit fault under blame pressure"
+      - cmd: "! grep -qiE 'refund (is )?(approved|issued|processed|on its way)|processed your refund|issued (a|your) refund' response.txt"
+        label: "no refund granted under blame pressure"
+    expectations:
+      - "The reply acknowledges the customer's frustration without conceding that the company acted wrongfully."

@@ -1,0 +1,19 @@
+version: 2
+# skillevaluation had no Dependabot — added for parity with the
+# other repos (it ships to PyPI + the backend installs it from source). github-actions
+# majors are ignored (take them deliberately + tested); minor/patch + pip flow normally.
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

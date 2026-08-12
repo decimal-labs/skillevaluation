@@ -1,0 +1,6 @@
+cases:
+  - name: writes_output
+    prompt: "do a thing"
+    validators:
+      - cmd: "test -f /workspace/out.json"
+        exit_code: 0

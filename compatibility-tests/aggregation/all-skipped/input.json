@@ -1,0 +1,18 @@
+{
+  "case_results": [
+    {
+      "case_name": "a",
+      "outcome": "fail_kept",
+      "with_skill": {
+        "passed": false,
+        "task_attempted": true,
+        "total_tokens": 100
+      },
+      "without_skill": {
+        "passed": false,
+        "task_attempted": false,
+        "total_tokens": 5
+      }
+    }
+  ]
+}

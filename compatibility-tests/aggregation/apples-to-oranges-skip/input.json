@@ -1,0 +1,16 @@
+{
+  "case_results": [
+    {
+      "case_name": "punted",
+      "outcome": "fail_kept",
+      "with_skill": {"passed": false, "total_tokens": 1000, "task_attempted": true, "errored": false},
+      "without_skill": {"passed": false, "total_tokens": 20, "task_attempted": false, "errored": false}
+    },
+    {
+      "case_name": "attempted",
+      "outcome": "flip_to_pass",
+      "with_skill": {"passed": true, "total_tokens": 500, "duration_ms": 1000, "turns": 4, "tool_call_count": 3, "task_attempted": true, "errored": false},
+      "without_skill": {"passed": false, "total_tokens": 400, "duration_ms": 2000, "turns": 7, "tool_call_count": 5, "task_attempted": true, "errored": false}
+    }
+  ]
+}

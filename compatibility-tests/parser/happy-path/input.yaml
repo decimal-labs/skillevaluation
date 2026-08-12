@@ -1,0 +1,8 @@
+cases:
+  - name: a
+    prompt: 'test prompt'
+    expectations:
+      - 'response is non-empty'
+    validators:
+      - cmd: "test -f /tmp/x"
+        expect_exit_code: 0

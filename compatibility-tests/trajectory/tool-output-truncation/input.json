@@ -1,0 +1,21 @@
+{
+  "user_input": null,
+  "final_output": null,
+  "llm_calls": [
+    {
+      "tool_calls_json": [
+        {
+          "name": "get_thing",
+          "args": {}
+        }
+      ]
+    }
+  ],
+  "spans": [
+    {
+      "span_type": "tool",
+      "name": "get_thing",
+      "output_preview": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    }
+  ]
+}

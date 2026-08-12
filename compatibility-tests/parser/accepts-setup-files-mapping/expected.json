@@ -1,0 +1,27 @@
+{
+  "cases": [
+    {
+      "name": "seeded_workspace",
+      "prompt": "Summarize the schema in schema.json.",
+      "setup_steps": [
+        "cp schema.json schema_copy.json"
+      ],
+      "setup_files": {
+        "schema.json": "{\"email\": \"string\"}",
+        "data/rows.csv": "email\na@b.co\n"
+      },
+      "expectations": [],
+      "script_validators": [
+        {
+          "cmd": "test -f schema_copy.json",
+          "expect_exit_code": 0,
+          "label": "test -f schema_copy.json"
+        }
+      ],
+      "tags": [],
+      "description": null,
+      "max_turns": null,
+      "should_trigger": null
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "error_class": "EvalYamlParseError",
+  "message_keywords": ["duplicate case name", "same"]
+}

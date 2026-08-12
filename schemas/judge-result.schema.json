@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/decimal-labs/skillevaluation/main/schemas/judge-result.schema.json",
+  "title": "skillevaluation LLM judge result",
+  "description": "Per-expectation result emitted by a conforming LLM judge. See spec/llm-judge.md.",
+  "type": "object",
+  "required": ["expectation", "passed", "reason"],
+  "additionalProperties": true,
+  "properties": {
+    "expectation": {
+      "type": "string",
+      "description": "Echo of the expectation text being graded."
+    },
+    "passed": {
+      "type": "boolean",
+      "description": "Did the agent's response satisfy this expectation?"
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "description": "1–3 sentence prose explanation grounded in observable agent behavior."
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Optional confidence in `passed`. Not used by run-level aggregation."
+    },
+    "errored": {
+      "type": "boolean",
+      "description": "True when the judge transport itself failed (API down, timeout) — the expectation is UNGRADED, not failed. Runners MUST roll this up into the arm's `errored` flag so the case classifies as outcome 'error' and is excluded from aggregate lift. See spec/llm-judge.md edge-case table."
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "error_class": "EvalYamlParseError",
+  "message_keywords": ["missing_assertions", "at least one assertion"]
+}

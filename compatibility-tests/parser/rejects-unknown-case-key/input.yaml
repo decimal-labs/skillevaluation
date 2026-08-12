@@ -1,0 +1,5 @@
+cases:
+  - name: classify_pii
+    prompt: "Classify these fields"
+    expectation:
+      - "Email is classified as PII"

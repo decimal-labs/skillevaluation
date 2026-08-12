@@ -1,0 +1,30 @@
+{
+  "cases": [
+    {
+      "name": "fires_on_topic",
+      "prompt": "How should I format an API error envelope for our service?",
+      "setup_steps": [],
+      "setup_files": {},
+      "expectations": [],
+      "script_validators": [],
+      "tags": [],
+      "description": null,
+      "max_turns": null,
+      "should_trigger": true
+    },
+    {
+      "name": "near_miss_also_graded",
+      "prompt": "Write a limerick about HTTP status codes.",
+      "setup_steps": [],
+      "setup_files": {},
+      "expectations": [
+        "The response is a limerick"
+      ],
+      "script_validators": [],
+      "tags": [],
+      "description": null,
+      "max_turns": null,
+      "should_trigger": false
+    }
+  ]
+}

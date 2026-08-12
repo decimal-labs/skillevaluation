@@ -1,0 +1,96 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "skillevaluation"
+version = "0.7.0"
+description = "An open spec for A/B benchmarking skills via declarative test suites."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Decimal AI" },
+]
+keywords = ["skill", "eval", "benchmark", "ab-test", "claude", "agent", "llm", "ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+# The reference local runner (`skillevaluation run`). Kept out of the core
+# install so the spec/scoring library stays PyYAML-only.
+runner = [
+    "httpx>=0.24",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.15,<0.16",
+    "mypy>=1.0,<2.2",
+    "jsonschema>=4.0",
+    "types-PyYAML>=6.0",
+    "httpx>=0.24",
+]
+
+[project.scripts]
+skillevaluation = "skillevaluation.runner.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["skillevaluation"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"skillevaluation/py.typed" = "skillevaluation/py.typed"
+# The builtin distractor pool for menu-selection trigger evaluation is package DATA, not
+# code, so it is force-included like py.typed and a packaging tweak can never drop it.
+# Note: nothing in this package has read it since 0.6.0 removed trigger execution
+# (ADR-0007), so it is a removal candidate on the next breaking release.
+"skillevaluation/runner/builtin_distractors.json" = "skillevaluation/runner/builtin_distractors.json"
+# Ship the spec + schemas + examples + conformance suite inside the wheel so
+# `pip install skillevaluation` carries the canonical artifacts (and the
+# README's headline `skillevaluation run <example>` works post-install from any
+# cwd via resources.example_path), not just links to them. The repo keeps them
+# at the root (readable on GitHub); the wheel maps them into the package where
+# skillevaluation.resources finds them.
+"schemas" = "skillevaluation/schemas"
+"spec" = "skillevaluation/spec"
+"examples" = "skillevaluation/examples"
+"compatibility-tests" = "skillevaluation/compatibility-tests"
+"CONFORMANCE.md" = "skillevaluation/CONFORMANCE.md"
+"CONTRIBUTING.md" = "skillevaluation/CONTRIBUTING.md"
+
+[project.urls]
+Homepage = "https://github.com/decimal-labs/skillevaluation"
+Documentation = "https://github.com/decimal-labs/skillevaluation/tree/main/spec"
+Repository = "https://github.com/decimal-labs/skillevaluation"
+Issues = "https://github.com/decimal-labs/skillevaluation/issues"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Coverage gate: suite measures 89% (line+branch) on the clean tree; the gate
+# is pinned to 80 (deliberate headroom, so the build stays
+# green now and can be ratcheted up as coverage tightens).
+addopts = "-v --tb=short --cov=skillevaluation --cov-branch --cov-fail-under=80"
