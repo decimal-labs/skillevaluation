@@ -1,0 +1,61 @@
+{
+  "_comment": "ILLUSTRATIVE shape-only fixture for the api-error-envelope suite — it documents the SHAPE a conforming runner emits (top-level keys + per-case `cases[]` entries), NOT golden values. Get the real headline from your own `skillevaluation run ./examples/api-error-envelope`: the without-skill arm omits request_id / doesn't nest under `error`; the with-skill arm emits the exact envelope. turns=1 / tool_calls=0 because the default `llm` adapter is single-shot.",
+  "verdict": "pass",
+  "format": "skillevaluation/test-run-result@v1",
+  "total_cases": 5,
+  "cases_aggregated": 5,
+  "cases_skipped_apples_oranges": 0,
+  "errors": 0,
+  "pass_rate": {
+    "with_skill": 1.0,
+    "without_skill": 0.2,
+    "delta_pts": 80.0
+  },
+  "duration_ms": {
+    "with_skill_avg": 1400,
+    "without_skill_avg": 1500,
+    "delta_pct": -6.7
+  },
+  "turns": {
+    "with_skill_avg": 1.0,
+    "without_skill_avg": 1.0,
+    "delta_pct": 0.0
+  },
+  "tokens": {
+    "with_skill_avg": 150,
+    "without_skill_avg": 170,
+    "delta_pct": -11.8
+  },
+  "tool_calls": {
+    "with_skill_avg": 0.0,
+    "without_skill_avg": 0.0,
+    "delta_pct": 0.0
+  },
+  "cases": [
+    {
+      "case_name": "not-found",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill returns a flat {\"error\": \"User not found\"} with no request_id; with-skill returns {\"error\": {\"code\": \"NOT_FOUND\", \"message\": \"...\", \"request_id\": \"...\"}}."
+    },
+    {
+      "case_name": "validation",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill omits request_id and/or uses a non-house code; with-skill emits the VALIDATION_ERROR envelope."
+    },
+    {
+      "case_name": "unauthorized",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill can't know the UNAUTHORIZED code + request_id requirement; with-skill emits the envelope."
+    },
+    {
+      "case_name": "rate-limited",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill returns a bare 429 message; with-skill emits the RATE_LIMITED envelope."
+    },
+    {
+      "case_name": "not-an-error-task",
+      "outcome": "pass_kept",
+      "_note": "Both arms answer '404' in plain prose; the skill correctly does not over-activate the envelope on a factual question."
+    }
+  ]
+}

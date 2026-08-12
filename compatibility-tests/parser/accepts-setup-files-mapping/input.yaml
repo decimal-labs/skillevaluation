@@ -1,0 +1,11 @@
+cases:
+  - name: seeded_workspace
+    prompt: "Summarize the schema in schema.json."
+    setup:
+      files:
+        schema.json: '{"email": "string"}'
+        data/rows.csv: "email\na@b.co\n"
+      commands:
+        - "cp schema.json schema_copy.json"
+    validators:
+      - cmd: "test -f schema_copy.json"

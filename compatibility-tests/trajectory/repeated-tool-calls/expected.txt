@@ -1,0 +1,6 @@
+[Step 1] User: Compare orders ORD-1 and ORD-2
+[Step 2] Agent → tool: get_order(order_id="ORD-1")
+[Step 3] Tool output: {"id":"ORD-1","status":"shipped"}
+[Step 4] Agent → tool: get_order(order_id="ORD-2")
+[Step 5] Tool output: {"id":"ORD-2","status":"pending"}
+[Step 6] Agent: ORD-1 shipped; ORD-2 is still pending.

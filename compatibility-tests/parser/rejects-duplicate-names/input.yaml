@@ -1,0 +1,9 @@
+cases:
+  - name: same
+    prompt: 'foo'
+    expectations:
+      - 'bar'
+  - name: same
+    prompt: 'baz'
+    expectations:
+      - 'qux'

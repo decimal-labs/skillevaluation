@@ -1,0 +1,9 @@
+cases:
+  - name: fires_on_topic
+    prompt: "How should I format an API error envelope for our service?"
+    should_trigger: true
+  - name: near_miss_also_graded
+    prompt: "Write a limerick about HTTP status codes."
+    should_trigger: false
+    expectations:
+      - "The response is a limerick"

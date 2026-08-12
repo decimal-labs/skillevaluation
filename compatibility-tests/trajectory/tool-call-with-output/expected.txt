@@ -1,0 +1,4 @@
+[Step 1] User: Status?
+[Step 2] Agent → tool: get_order(order_id="ORD-1")
+[Step 3] Tool output: {"status":"shipped","carrier":"UPS"}
+[Step 4] Agent: It shipped.

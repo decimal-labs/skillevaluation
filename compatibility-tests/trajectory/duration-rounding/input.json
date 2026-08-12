@@ -1,0 +1,17 @@
+{
+  "user_input": "ping",
+  "final_output": null,
+  "llm_calls": [
+    {
+      "output_preview": "Quarter-second reply.",
+      "latency_ms": 250,
+      "started_at": null
+    },
+    {
+      "output_preview": "Sub-50ms reply, no marker.",
+      "latency_ms": 40,
+      "started_at": null
+    }
+  ],
+  "spans": []
+}

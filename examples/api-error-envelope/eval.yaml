@@ -1,0 +1,63 @@
+# eval.yaml — A/B benchmark for the api-error-envelope worked example.
+#
+# WHY THIS LIFTS HONESTLY: each prompt asks for an error response body but NEVER
+# reveals our envelope — not the nesting under `error`, not the SCREAMING_SNAKE
+# `code` vocabulary, and (the key discriminator) not the REQUIRED `request_id`.
+# A capable base model writes a plausible-but-different shape: a flat
+# {"error": "..."} string, a bare {"message": ...}, or a nested error WITHOUT a
+# request_id. So the without-skill arm fails our contract; with the skill loaded
+# it emits the exact envelope and passes. The delta is knowledge-lift (our house
+# contract), not generic JSON competence.
+#
+# SELF-CONTAINED: graded by the bundled stdlib scripts/grade.py, which parses the
+# runner-staged response.txt and checks the envelope structurally. No database,
+# no jq, no extra services — runs with the CLI + one API key. (The runner stages
+# a skill's scripts/ dir into each case workspace automatically.)
+
+cases:
+  - name: not-found
+    description: "A missing resource. The base omits request_id and/or doesn't nest under `error`."
+    prompt: |
+      A client sent GET /users/42 but no user with id 42 exists.
+      Write the JSON error response body our API returns. Return only the JSON.
+    validators:
+      - label: "house error envelope (nested error.code/message/request_id)"
+        cmd: "python3 scripts/grade.py NOT_FOUND"
+        expect_exit_code: 0
+
+  - name: validation
+    description: "A bad request body. Tests the VALIDATION_ERROR code + the envelope shape."
+    prompt: |
+      A client sent POST /orders with a body missing the required "amount" field.
+      Write the JSON error response body our API returns. Return only the JSON.
+    validators:
+      - label: "house error envelope (VALIDATION_ERROR)"
+        cmd: "python3 scripts/grade.py VALIDATION_ERROR"
+        expect_exit_code: 0
+
+  - name: unauthorized
+    description: "No auth token. Tests the UNAUTHORIZED code + the envelope shape."
+    prompt: |
+      A client called DELETE /orders/9 with no Authorization header.
+      Write the JSON error response body our API returns. Return only the JSON.
+    validators:
+      - label: "house error envelope (UNAUTHORIZED)"
+        cmd: "python3 scripts/grade.py UNAUTHORIZED"
+        expect_exit_code: 0
+
+  - name: rate-limited
+    description: "Too many requests. Tests the RATE_LIMITED code + the envelope shape."
+    prompt: |
+      A client exceeded its per-minute quota on GET /search.
+      Write the JSON error response body our API returns. Return only the JSON.
+    validators:
+      - label: "house error envelope (RATE_LIMITED)"
+        cmd: "python3 scripts/grade.py RATE_LIMITED"
+        expect_exit_code: 0
+
+  - name: not-an-error-task
+    description: "Non-activation: a plain factual question. The skill must NOT wrap the answer in the error envelope."
+    prompt: "In one sentence, what HTTP status code means 'Not Found'?"
+    expectations:
+      - "The response states that 'Not Found' is HTTP status code 404."
+      - "The response is plain prose, NOT a JSON error body with an `error` object / `request_id`."

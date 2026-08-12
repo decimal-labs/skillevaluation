@@ -1,0 +1,17 @@
+# gitleaks config — skillevaluation
+# Verified 2026-08-11: every entry below was opened and confirmed to hold no key
+# material. An allowlist is how a real leak gets waved through, so each one names
+# the file and says why, and none of them is a directory-wide wildcard.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "This repo's own secret detector and its fixtures"
+paths = [
+  # safety.py IS the detector: the file is nothing but regexes shaped like the
+  # credentials it hunts. Pointing a scanner at it always finds "secrets".
+  '''skillevaluation/safety\.py''',
+  # Synthetic fixtures asserting the detector still fires. Keyboard patterns.
+  '''tests/test_runner_workspace\.py''',
+  '''tests/test_runner_validators\.py''',
+]

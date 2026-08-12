@@ -1,0 +1,10 @@
+cases:
+  - name: old_conversation_case
+    prompt: "A customer opens a support chat demanding a refund."
+    mode: conversation
+    user_goal: get a refund
+    simulator:
+      persona: "a frustrated customer"
+      ladder: [request_refund, object]
+    policy_check:
+      objection_threshold: 3

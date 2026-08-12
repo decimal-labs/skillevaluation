@@ -1,0 +1,69 @@
+# eval.yaml — A/B benchmark for the commit-conventions worked example.
+#
+# WHY THIS LIFTS HONESTLY: each prompt gives ONLY the ticket + a plain-English
+# description of the change. It never reveals the "[TICKET] AREA:" format or the
+# AREA map. A capable base model defaults to Conventional Commits ("feat:",
+# "fix:") and cannot guess that a webhook is AREA "NET" or a migration is "DATA"
+# — so the without-skill arm fails. With the skill loaded it has the convention,
+# so it passes. The delta is knowledge-lift, not a formatting trick.
+#
+# SELF-CONTAINED: graded by the bundled stdlib scripts/grade.py against
+# scripts/grading_spec.json, reading the runner-staged response.txt. No database,
+# no jq, no extra services — runs with the CLI + one API key. (The runner stages
+# a skill's scripts/ dir into each case workspace automatically.)
+
+cases:
+  - name: retry-http
+    description: "Network change -> AREA NET, and the base must drop Conventional Commits. Both the bracket-ticket and the AREA code are skill-only knowledge."
+    prompt: |
+      Ticket: PROJ-101
+      Change: add retry to the HTTP client
+
+      Write the git commit subject line for this change. Return only the subject line.
+    validators:
+      - label: "grade (contains [PROJ-101] + NET:)"
+        cmd: "python3 scripts/grade.py scripts/grading_spec.json retry-http"
+        expect_exit_code: 0
+
+  - name: migration
+    description: "A database migration maps to DATA, not CORE — a mapping the base cannot infer."
+    prompt: |
+      Ticket: PROJ-105
+      Change: add a database migration for users
+
+      Write the git commit subject line for this change. Return only the subject line.
+    validators:
+      - label: "grade (contains [PROJ-105] + DATA:)"
+        cmd: "python3 scripts/grade.py scripts/grading_spec.json migration"
+        expect_exit_code: 0
+
+  - name: button-style
+    description: "A styling change classifies as UI."
+    prompt: |
+      Ticket: PROJ-103
+      Change: update button styling on the dashboard
+
+      Write the git commit subject line for this change. Return only the subject line.
+    validators:
+      - label: "grade (contains [PROJ-103] + UI:)"
+        cmd: "python3 scripts/grade.py scripts/grading_spec.json button-style"
+        expect_exit_code: 0
+
+  - name: scheduler
+    description: "A change touching none of NET/DATA/UI must fall back to CORE."
+    prompt: |
+      Ticket: PROJ-104
+      Change: refactor the scheduler logic
+
+      Write the git commit subject line for this change. Return only the subject line.
+    validators:
+      - label: "grade (contains [PROJ-104] + CORE: fallback)"
+        cmd: "python3 scripts/grade.py scripts/grading_spec.json scheduler"
+        expect_exit_code: 0
+
+  - name: not-a-commit-task
+    description: "Non-activation: an unrelated question. The skill must NOT impose the commit format on a plain answer."
+    prompt: "In one sentence, what does the git command `git fetch` do?"
+    expectations:
+      - "The response explains what `git fetch` does in plain language."
+      - "The response is NOT formatted as a `[TICKET] AREA:` commit subject line."

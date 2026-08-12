@@ -1,0 +1,30 @@
+{
+  "user_input": "search please",
+  "final_output": null,
+  "llm_calls": [
+    {
+      "output_preview": null,
+      "latency_ms": null,
+      "started_at": null,
+      "tool_calls_json": [
+        {
+          "name": "search",
+          "args": {
+            "flags": [
+              "x",
+              "y"
+            ],
+            "filter": {
+              "a": 1,
+              "b": 2
+            },
+            "temp": 1.0,
+            "count": 5,
+            "q": "café"
+          }
+        }
+      ]
+    }
+  ],
+  "spans": []
+}

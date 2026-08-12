@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test, lint and type-check caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.benchmarks/
+.deepeval/
+.coverage
+.coverage.*
+coverage.xml
+coverage/
+htmlcov/
+
+# Node
+node_modules/
+.next/
+*.log
+
+# Environment files. Real credentials never belong in the tree;
+# .env.example is the tracked template, so it is re-included.
+.env
+.env.*
+!.env.example
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local agent/tool state
+.claude/settings.local.json
+
+# CLI default run output (scratch — never commit)
+results.json

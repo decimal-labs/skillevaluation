@@ -1,0 +1,53 @@
+{
+  "_comment": "Three uniform i.i.d. runs of one case sharing case_name 'flaky' (runner-level runs=3, schema rev 2). Rates are MEANS over all (case, run) records: with-skill passes 2 of 3 -> 0.6667; without-skill 0 of 3 -> 0. The expected value of the mean does not depend on the run count \u2014 more runs only narrow the error bars; flakiness is visible in the per-run records, never an AND-fold on the headline.",
+  "case_results": [
+    {
+      "case_name": "flaky",
+      "outcome": "flip_to_pass",
+      "with_skill": {
+        "passed": true,
+        "turns": 2,
+        "total_tokens": 100,
+        "task_attempted": true
+      },
+      "without_skill": {
+        "passed": false,
+        "turns": 4,
+        "total_tokens": 200,
+        "task_attempted": true
+      }
+    },
+    {
+      "case_name": "flaky",
+      "outcome": "flip_to_pass",
+      "with_skill": {
+        "passed": true,
+        "turns": 2,
+        "total_tokens": 100,
+        "task_attempted": true
+      },
+      "without_skill": {
+        "passed": false,
+        "turns": 4,
+        "total_tokens": 200,
+        "task_attempted": true
+      }
+    },
+    {
+      "case_name": "flaky",
+      "outcome": "fail_kept",
+      "with_skill": {
+        "passed": false,
+        "turns": 2,
+        "total_tokens": 100,
+        "task_attempted": true
+      },
+      "without_skill": {
+        "passed": false,
+        "turns": 4,
+        "total_tokens": 200,
+        "task_attempted": true
+      }
+    }
+  ]
+}

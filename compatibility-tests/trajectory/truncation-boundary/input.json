@@ -1,0 +1,24 @@
+{
+  "user_input": "fetch",
+  "final_output": null,
+  "llm_calls": [
+    {
+      "output_preview": null,
+      "latency_ms": null,
+      "started_at": null,
+      "tool_calls_json": [
+        {
+          "name": "fetch",
+          "args": {}
+        }
+      ]
+    }
+  ],
+  "spans": [
+    {
+      "span_type": "tool",
+      "name": "fetch",
+      "output_preview": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA🚀🚀🚀🚀🚀🚀🚀"
+    }
+  ]
+}

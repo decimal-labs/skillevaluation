@@ -1,0 +1,16 @@
+{
+  "case_results": [
+    {
+      "case_name": "a",
+      "outcome": "error",
+      "with_skill": {
+        "passed": false,
+        "errored": true
+      },
+      "without_skill": {
+        "passed": false,
+        "errored": true
+      }
+    }
+  ]
+}

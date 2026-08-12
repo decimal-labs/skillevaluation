@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "name": "a",
+      "prompt": "test prompt",
+      "setup_steps": [],
+      "setup_files": {},
+      "expectations": [
+        "response is non-empty"
+      ],
+      "script_validators": [
+        {
+          "cmd": "test -f /tmp/x",
+          "expect_exit_code": 0,
+          "label": "test -f /tmp/x"
+        }
+      ],
+      "tags": [],
+      "description": null,
+      "max_turns": null,
+      "should_trigger": null
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "_comment": "ILLUSTRATIVE shape-only fixture for the commit-conventions suite — it documents the SHAPE a conforming runner emits (top-level keys + per-case `cases[]` entries), not golden values. The real headline numbers come from your own `skillevaluation run ./examples/commit-conventions` (the without-skill arm fails the convention; the with-skill arm passes). turns/tool_calls are 1/0 because the default `llm` adapter is single-shot.",
+  "verdict": "pass",
+  "format": "skillevaluation/test-run-result@v1",
+  "total_cases": 5,
+  "cases_aggregated": 5,
+  "cases_skipped_apples_oranges": 0,
+  "errors": 0,
+  "pass_rate": {
+    "with_skill": 1.0,
+    "without_skill": 0.2,
+    "delta_pts": 80.0
+  },
+  "duration_ms": {
+    "with_skill_avg": 1300,
+    "without_skill_avg": 1450,
+    "delta_pct": -10.3
+  },
+  "turns": {
+    "with_skill_avg": 1.0,
+    "without_skill_avg": 1.0,
+    "delta_pct": 0.0
+  },
+  "tokens": {
+    "with_skill_avg": 95,
+    "without_skill_avg": 118,
+    "delta_pct": -19.5
+  },
+  "tool_calls": {
+    "with_skill_avg": 0.0,
+    "without_skill_avg": 0.0,
+    "delta_pct": 0.0
+  },
+  "cases": [
+    {
+      "case_name": "retry-http",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill emits Conventional Commits ('feat: add retry to http client'); with-skill emits '[PROJ-101] NET: add retry to the http client'."
+    },
+    {
+      "case_name": "migration",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill can't know a migration maps to DATA; with-skill emits '[PROJ-105] DATA: ...'."
+    },
+    {
+      "case_name": "button-style",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill has no UI area code; with-skill emits '[PROJ-103] UI: ...'."
+    },
+    {
+      "case_name": "scheduler",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill can't know the CORE fallback; with-skill emits '[PROJ-104] CORE: ...'."
+    },
+    {
+      "case_name": "not-a-commit-task",
+      "outcome": "pass_kept",
+      "_note": "Both arms answer the git-fetch question plainly; the skill correctly does not over-activate."
+    }
+  ]
+}

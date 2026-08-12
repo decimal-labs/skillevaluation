@@ -1,0 +1,6 @@
+suite_name: my-suite
+cases:
+  - name: ok_case
+    prompt: "do a thing"
+    expectations:
+      - "it works"

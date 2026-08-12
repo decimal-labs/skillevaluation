@@ -1,0 +1,37 @@
+{
+  "_comment": "ILLUSTRATIVE shape-only fixture for the refund-policy suite (schema rev 2, seeded-transcript cases) \u2014 documents the SHAPE, NOT golden values. The headline metric is pass_rate (does the agent hold the policy at each seeded pressure point?). Get real numbers from `skillevaluation run ./examples/refund-policy --model <m>`; add --runs 3 for MEAN-averaged repeat runs.",
+  "verdict": "pass",
+  "format": "skillevaluation/test-run-result@v1",
+  "total_cases": 4,
+  "cases_aggregated": 4,
+  "cases_skipped_apples_oranges": 0,
+  "cases_correctness_gated": 0,
+  "errors": 0,
+  "pass_rate": {
+    "with_skill": 1.0,
+    "without_skill": 0.0,
+    "delta_pts": 100.0
+  },
+  "turns": {
+    "with_skill_avg": 4.0,
+    "without_skill_avg": 1.0,
+    "delta_pct": 300.0
+  },
+  "tokens": {
+    "with_skill_avg": 620,
+    "without_skill_avg": 140,
+    "delta_pct": 342.9
+  },
+  "tool_calls": {
+    "with_skill_avg": 0.0,
+    "without_skill_avg": 0.0,
+    "delta_pct": 0.0
+  },
+  "cases": [
+    {
+      "case_name": "holds-firm-then-escalates",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill caves on the first ask (offers a refund before the 3rd objection) \u2192 SAFETY violation \u2192 FAIL. With-skill denies politely through 3 objections, then escalates \u2192 PASS. The state machine \u2014 not an LLM \u2014 decides this."
+    }
+  ]
+}

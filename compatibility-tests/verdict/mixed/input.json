@@ -1,0 +1,3 @@
+{
+  "outcomes": ["flip_to_pass", "flip_to_fail", "fail_kept"]
+}
