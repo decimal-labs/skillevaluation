@@ -41,9 +41,9 @@ _CAPTURE_LIMIT = 500
 ENV_RESPONSE_MAX_CHARS = 64_000
 
 # ── Validator sandbox ───────────────────────────────────────────────────────────
-# A validator is author-controlled shell, and a hosted runner executes it server-side to
-# grade skills its operator did not write. The env-scrub (see run_validators) already removes
-# the secret-exfil path; these two layers harden the *execution* itself:
+# A validator is author-controlled shell, and running a suite executes it on YOUR machine —
+# including suites for skills you did not write. The env-scrub (see run_validators) already
+# removes the secret-exfil path; these two layers harden the *execution* itself:
 #
 #   1. Resource limits (always on, POSIX): cap CPU seconds, max file size, and core
 #      dumps in a preexec_fn so a validator can't peg a core, fill the disk, or dump
@@ -166,13 +166,11 @@ def run_validators(
     if not validators:
         return results
 
-    # Do NOT inherit the full parent environment.
-    # A validator is author-controlled shell, and a hosted runner grades skills its
-    # operator did not write — passing os.environ would hand that shell whatever DB
-    # credentials and API keys the server process holds, ready to exfiltrate.
-    # Start from a minimal, safe allowlist. (A real OS sandbox — no net, non-root,
-    # seccomp/throwaway container — is the recommended follow-up; this removes the
-    # secret-exfil path now.)
+    # Do NOT inherit the full parent environment. A validator is author-controlled shell,
+    # so inheriting os.environ would hand it whatever credentials the calling process
+    # happens to hold. Start from a minimal allowlist; the sandbox note above covers the
+    # resource clamp, the network namespace, and (its last paragraph) the throwaway-container
+    # recommendation for untrusted third-party skills.
     safe_env_keys = (
         "PATH", "LANG", "LC_ALL", "LC_CTYPE", "TZ", "DECIMAL_VALIDATOR_PY",
     )

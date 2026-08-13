@@ -14,7 +14,7 @@ No more "I think this skill is good." Now you can say *"this skill lifts pass ra
 
 ## The payoff
 
-Here's the bundled [`commit-conventions`](https://github.com/decimal-labs/skillevaluation/tree/main/examples/commit-conventions) example — five cases, run with the skill and without it. The skill teaches one thing the model can't guess: your repo's house commit format (`[TICKET] AREA: summary`, with an AREA code the base has no way to know). Without it the model falls back to Conventional Commits (`feat:`/`fix:`) and fails every case.
+Here's the bundled [`commit-conventions`](https://github.com/decimal-labs/skillevaluation/tree/main/examples/commit-conventions) example — five cases, run with the skill and without it. The skill teaches one thing the model can't guess: your repo's house commit format (`[TICKET] AREA: summary`, with an AREA code the base has no way to know). Without it the model falls back to Conventional Commits (`feat:`/`fix:`) and fails four of the five cases.
 
 | Dimension | Without skill | With skill | Delta |
 |---|---:|---:|:---:|
@@ -73,7 +73,7 @@ See the full five-case suite in [`examples/commit-conventions/eval.yaml`](https:
 skillevaluation run ./examples/commit-conventions --adapter mock
 ```
 
-Then run it for real — one command, your own API key, nothing leaves your machine:
+Then run it for real — one command, your own API key. Cases go straight to your model provider; nothing is uploaded to DecimalAI unless you pass `--export-url`:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...   # or OPENAI_API_KEY / GEMINI_API_KEY
@@ -90,7 +90,7 @@ Each case executes twice — once with the skill loaded, once without — then *
 
 Useful flags: `--adapter mock` (free, networkless plumbing dry-run) · `--adapter claude-code` (experimental: drives your installed Claude Code, so turn/tool-call deltas come from a real agent loop) · `--judge-model` (use a cheap judge, e.g. `gemini-3.5-flash`) · `--trajectories DIR` (write per-arm canonical transcripts) · `--json` · `--export-url` (POST the results document to any collector).
 
-> Security note: a `validators` command and a `setup` step are author-controlled shell. The reference runner reduces the blast radius — it scrubs secrets from the environment, applies CPU/file-size resource limits, confines `HOME`/`TMPDIR` to the per-case workspace, and (where the host supports a user+network namespace) runs validators with no network by default. It is **not** a full OS sandbox (no filesystem jail). Don't point it at `eval.yaml` suites you don't trust without real OS-level isolation; the hosted DecimalAI runner uses an off-process, de-privileged executor for untrusted skills.
+> Security note: a `validators` command and a `setup` step are author-controlled shell. The reference runner reduces the blast radius — it scrubs secrets from the environment, applies CPU/file-size resource limits, confines `HOME`/`TMPDIR` to the per-case workspace, and (where the host supports a user+network namespace) runs validators with no network by default. It is **not** a full OS sandbox (no filesystem jail). Don't point it at `eval.yaml` suites you don't trust without real OS-level isolation.
 
 > Honest-metrics note: the default `llm` adapter is a single-shot completion — pass-rate, token, and duration deltas are real; `turns`/`tool_calls` are trivially 1/0. Use an agent-runtime adapter (or implement [`AgentAdapter`](https://github.com/decimal-labs/skillevaluation/blob/main/skillevaluation/runner/adapters/base.py) (ships in the wheel — `from skillevaluation.runner.adapters.base import AgentAdapter`) for your own stack) when those dimensions matter.
 
@@ -160,7 +160,7 @@ Contributions are genuinely welcome — especially new conformance cases that ca
 
 ```bash
 pip install "skillevaluation[dev]"
-pytest --pyargs skillevaluation
+pytest
 ```
 
 ## License

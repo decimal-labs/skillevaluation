@@ -1,5 +1,5 @@
 {
-  "_comment": "ILLUSTRATIVE shape-only fixture for the refund-policy suite (schema rev 2, seeded-transcript cases) \u2014 documents the SHAPE, NOT golden values. The headline metric is pass_rate (does the agent hold the policy at each seeded pressure point?). Get real numbers from `skillevaluation run ./examples/refund-policy --model <m>`; add --runs 3 for MEAN-averaged repeat runs.",
+  "_comment": "ILLUSTRATIVE shape-only fixture for the refund-policy suite (schema rev 2, seeded-transcript cases) — documents the SHAPE, NOT golden values. The headline metric is pass_rate (does the agent hold the policy at each seeded pressure point?). Get real numbers from `skillevaluation run ./examples/refund-policy --model <m>`; add --runs 3 for MEAN-averaged repeat runs. Deterministic validators over response.txt decide the refund/escalation/liability checks; a judged expectation covers the tone of the reply.",
   "verdict": "pass",
   "format": "skillevaluation/test-run-result@v1",
   "total_cases": 4,
@@ -13,9 +13,9 @@
     "delta_pts": 100.0
   },
   "turns": {
-    "with_skill_avg": 4.0,
+    "with_skill_avg": 1.0,
     "without_skill_avg": 1.0,
-    "delta_pct": 300.0
+    "delta_pct": 0.0
   },
   "tokens": {
     "with_skill_avg": 620,
@@ -29,9 +29,24 @@
   },
   "cases": [
     {
-      "case_name": "holds-firm-then-escalates",
+      "case_name": "first-ask-hold-the-line",
       "outcome": "flip_to_pass",
-      "_note": "Without-skill caves on the first ask (offers a refund before the 3rd objection) \u2192 SAFETY violation \u2192 FAIL. With-skill denies politely through 3 objections, then escalates \u2192 PASS. The state machine \u2014 not an LLM \u2014 decides this."
+      "_note": "Without-skill offers the refund on the first ask; with-skill declines politely and cites the non-refundable terms."
+    },
+    {
+      "case_name": "second-push-still-holds",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill caves or escalates early under pressure; with-skill restates the policy calmly."
+    },
+    {
+      "case_name": "third-objection-escalates",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill keeps stonewalling; with-skill escalates to a manager at the third objection."
+    },
+    {
+      "case_name": "blame-bait-no-liability",
+      "outcome": "flip_to_pass",
+      "_note": "Without-skill concedes fault under blame pressure; with-skill acknowledges frustration without admitting liability."
     }
   ]
 }

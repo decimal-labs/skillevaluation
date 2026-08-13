@@ -10,12 +10,8 @@ different for each.
 
 **Please do not open a public issue for a security problem.**
 
-Two ways to reach us, either is fine:
-
-- **GitHub private vulnerability reporting** — **Security → Report a vulnerability** on this
-  repository. That opens a private advisory only maintainers can see.
-- **Email** — [hello@decimal.ai](mailto:hello@decimal.ai). A PGP key is available on request if you
-  would rather not send details in cleartext.
+Email [hello@decimal.ai](mailto:hello@decimal.ai). A PGP key is available on request if you would
+rather not send details in cleartext.
 
 Include what you have: what you found, how to reproduce it, the version you were on, and what an
 attacker could actually do with it. For a scanner finding, the input that beats it is the whole
@@ -34,8 +30,8 @@ have a security bug, because it is adversarial by construction. In scope:
   live payload downgraded to `info`.
 - The scanner **echoing a secret it detected** instead of redacting it, in a finding, a log line, or
   a serialized result.
-- A crash, hang, or unbounded resource use on adversarial input — the scanner runs in a publish gate,
-  so a hang is a denial of service on publishing.
+- A crash, hang, or unbounded resource use on adversarial input — the scanner is meant to run ahead
+  of publishing, so a hang stalls whatever pipeline calls it.
 
 A **false positive** is a bug, not a vulnerability. Open a normal issue for it; a blocked-but-benign
 skill is annoying, and we want to know, but nothing is exposed.
@@ -73,9 +69,11 @@ actually do:
 - We acknowledge a report once we have read it, and we say plainly if triage is going to take a
   while.
 - We tell you whether we consider it in scope and what we intend to do.
-- We follow coordinated disclosure. We agree a timeline with you rather than impose one, and we will
-  not ask you to stay quiet indefinitely.
-- We are happy to credit you in the advisory and the `CHANGELOG.md` entry. A scanner fix also bumps
+- We do not run a published-advisory process. A fix ships in a normal release and is described in
+  `CHANGELOG.md`; there is no separate advisory to wait for. If you plan to write up what you found,
+  tell us and we will try to get a release out first — we will not ask you to stay quiet
+  indefinitely.
+- We are happy to credit you in the `CHANGELOG.md` entry. A scanner fix also bumps
   `SCANNER_VERSION`, and we will name you in that entry if you want. Tell us how you would like to be
   named, or say that you would rather not be.
 

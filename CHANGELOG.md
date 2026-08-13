@@ -6,8 +6,8 @@ All notable changes to `skillevaluation` are documented here. Format follows [Ke
 
 ## [0.7.0] — 2026-07-31
 
-Measurement-honesty fix. One behavior change in the
-reference runner (it makes numbers strictly more honest; no eval.yaml format change):
+Measurement-honesty fix. One behavior change in the reference runner (it makes numbers
+strictly more honest; no eval.yaml format change):
 
 - **A validator that never returns a verdict is now an error channel, not a fail** —
   `runner.validators.run_validators` marks a wall-clock **timeout** and a **spawn
@@ -15,10 +15,10 @@ reference runner (it makes numbers strictly more honest; no eval.yaml format cha
   orchestrator already rolls that into the case outcome `error`, excluding it from lift
   — exactly like a non-binary undeclared exit code and like a judge transport error
   (0.5.0). Recording "fail" asserted a verdict no grader produced, and since graders run
-  **per arm**, a grader that stalled or failed to spawn on only one arm's output
-  manufactured a flip in whichever direction it landed. It was also internally
-  inconsistent: the same grader killed by `RLIMIT_CPU` exits with a negative returncode
-  and already errored, so two flavours of the same failure classified oppositely.
+  **per arm**, a grader that stalled or failed to spawn on only one arm's output skewed
+  the delta. It was also internally inconsistent: the same grader killed by `RLIMIT_CPU`
+  exits with a negative returncode and already errored, so two flavours of the same
+  failure classified oppositely.
 - Schema: `validatorResult` now declares the optional `errored` property (it previously
   rode on `additionalProperties`), mirroring `judge-result.schema.json`.
 - Spec: new normative sentence in `runner-contract.md` (step 3) and a clarifying clause
@@ -54,24 +54,21 @@ the agent is invoked once per case in a prepared workspace, may take many tool s
 
 ## [0.5.0] — 2026-07-08
 
-Measurement-honesty fixes from the 2026-07 platform measurement audit. Two behavior
-changes in the reference runner/aggregation (both make numbers strictly more honest;
-no eval.yaml format change):
+Measurement-honesty fixes. Two behavior changes in the reference runner/aggregation
+(both make numbers strictly more honest; no eval.yaml format change):
 
 - **Judge transport errors are now an error channel, not a fail** — `runner.judge.
   judge_expectations` marks a transport failure `errored: true` on the result dict
   (schema: new optional `errored` property), and the reference orchestrator rolls it
   up into the case outcome `error` (excluded from lift), exactly like script-validator
-  breakage. Previously a judge outage graded as `passed=False` — a model fail — which
-  manufactured `flip_to_pass` lift when it hit the without-arm. Spec: new edge-case
-  row in `spec/llm-judge.md`.
+  breakage. Previously a judge transport failure was recorded as a failed assertion, so
+  a one-arm outage skewed the delta. Spec: new edge-case row in `spec/llm-judge.md`.
 - **`error_dominated` now also nulls `pass_at_k.delta_pts`** — the floor previously
   nulled only `pass_rate.delta_pts`, so a consumer preferring pass^k for its headline
   read an un-withheld delta off an invalid run. Per-arm pass^k rates and disclosure
   counts survive; only the claim is withdrawn (parity with `pass_rate`).
 
-Safety-scanner calibration in `skillevaluation.safety` (the DecimalAI registry runs the
-same engine, so the two copies stay in step):
+Safety-scanner calibration in `skillevaluation.safety`:
 
 - **Bidi controls split by risk.** Overrides/embeddings `U+202A–U+202E` (classic
   Trojan Source) stay CRITICAL and non-downgradable; isolates `U+2066–U+2069` (the
@@ -85,9 +82,8 @@ same engine, so the two copies stay in step):
 
 ## [0.4.0] — 2026-07-05
 
-Adds `skillevaluation.safety` — the deterministic static safety scanner for skill
-content (the open-source extraction of the DecimalAI registry's first-pass publish gate), and a
-`skillevaluation scan` CLI subcommand.
+Adds `skillevaluation.safety` — a deterministic static safety scanner for skill
+content, and a `skillevaluation scan` CLI subcommand.
 
 - `skillevaluation.safety.scan_skill_content(...)` — a pure function (stdlib-only,
   no DB/network/LLM) that flags committed secrets, remote-code-execution / reverse
@@ -165,7 +161,7 @@ the point), so pin `skillevaluation>=0.3.0` before adopting them.
 
 ## [0.2.4] — 2026-06-24
 
-Audit-driven hardening release: honesty fixes across the OSS↔platform seam, multi-turn **grading**
+Audit-driven hardening release: honesty fixes, multi-turn **grading**
 conformance coverage, security hardening of the published runner, and better first-run examples.
 
 ### Security
@@ -217,8 +213,8 @@ conformance coverage, security hardening of the published runner, and better fir
 - **Conversation labeler fails safe** on the `always_forbidden` axis (a missed forbidden act no longer
   maps to a no-op and passes), and the parser **requires `policy_check` + `simulator.ladder` for
   `conversation` at parse time** (mirroring explore) so a malformed case fails before an LLM run.
-- **`task_attempted` is carried in the replay/attestation bundle meta** so a hosted re-grade honors the
-  same apples-to-oranges skip rule the producer used (no verified-vs-local drift).
+- **`task_attempted` is carried in the replay/attestation bundle meta** so a re-grade from the bundle
+  honors the same apples-to-oranges skip rule the original run used (no replay-vs-original drift).
 - **Baseline cache scope** folds the claude-code adapter's `max_turns` into its identity so a config
   change invalidates a stale baseline.
 
@@ -240,8 +236,8 @@ conformance coverage, security hardening of the published runner, and better fir
 ## [0.2.3] — 2026-06-21
 
 ### Added
-- **Multi-turn rollout runners** — two new shared, honest A/B implementations the hosted platform
-  runner delegates to (so multi-turn grading can't drift between the OSS CLI and hosted runs):
+- **Multi-turn rollout runners** — two new shared, honest A/B implementations, so every caller grades
+  multi-turn cases through one code path instead of reimplementing it:
   - `skillevaluation.conversation.run_conversation_with_complete` — `conversation` mode: an LLM
     user-simulator drives the dialogue while the harness owns the intent ladder + turn counter; graded
     by a pure-code state machine over a labeled event log (prose is never the grader). The label matcher
@@ -257,7 +253,7 @@ conformance coverage, security hardening of the published runner, and better fir
 ## [0.2.2] — 2026-06-15
 
 ### Fixed
-- **Workspace `setup:` step sandbox hardening** (completes the 0.2.1 validator scrub): `prepare_workspace()` setup commands — the `setup:` shell from an eval.yaml — no longer inherit the full parent environment. They run with the same scrubbed `PATH`/`HOME`/`TMPDIR`/… allowlist as validators, so when the runner grades an untrusted skill server-side, a malicious `setup:` step can't read `GEMINI_API_KEY` / `DECIMAL_DATABASE_URL`. Previously only the *validator* subprocess was scrubbed; the setup steps were not.
+- **Workspace `setup:` step sandbox hardening** (completes the 0.2.1 validator scrub): `prepare_workspace()` setup commands — the `setup:` shell from an eval.yaml — no longer inherit the full parent environment. They run with the same scrubbed `PATH`/`HOME`/`TMPDIR`/… allowlist as validators, so a malicious `setup:` step cannot read your credentials. Previously only the *validator* subprocess was scrubbed; the setup steps were not.
 - Strict-mypy annotations on `cli.py` (dict type-args, `DeltaResult`) so the package type-checks clean under CI.
 
 ## [0.2.1] — 2026-06-05
@@ -267,7 +263,7 @@ conformance coverage, security hardening of the published runner, and better fir
 - **Per-arm workspace isolation**: each arm now gets its own workspace prepared from the same `setup` steps. Previously both arms shared one directory, so a file-writing agent's with-skill artifacts were readable by the without-skill arm (and graded by its validators), silently biasing `flip_to_pass` down to `pass_kept`. Even chat-only runs could distort: a validator with side effects (`mkdir out && …`) passed on one arm and failed on the other purely from ordering.
 - The Gemini API key moved from a `?key=` query parameter to the `x-goog-api-key` header. httpx error strings embed the full request URL and those strings flow into `results.json` (and any `--export-url` upload) — the query-param form leaked the key into both.
 - Validator runs no longer crash the suite on spawn failures: `$RESPONSE_TEXT` is capped at 64k chars (single env entries have a hard OS ceiling — `response.txt` always carries the full output), and unspawnable commands (E2BIG, NUL bytes) fail that one validator instead of raising out of the run after the arms already spent tokens.
-- **Validator sandbox hardening** (the runner is imported server-side to grade untrusted skills): the validator subprocess no longer inherits the full environment (scrubbed to a safe `PATH`/`HOME`/`TMPDIR`/… allowlist, so DB creds / API keys can't be exfiltrated), and now runs under an OS resource sandbox — a `preexec_fn` clamps CPU time, max file size, and core dumps (`RLIMIT_CPU`/`FSIZE`/`CORE`). Optional network isolation via `DECIMAL_VALIDATOR_SANDBOX_NET=unshare` wraps the command in `unshare -rn` (no network → closes metadata-server SSRF) when the host supports a user+net namespace; default off so it never spuriously fails where unsupported.
+- **Validator sandbox hardening**: the validator subprocess no longer inherits the full environment (scrubbed to a safe `PATH`/`HOME`/`TMPDIR`/… allowlist, so the caller's credentials aren't visible to the validator), and now runs under an OS resource sandbox — a `preexec_fn` clamps CPU time, max file size, and core dumps (`RLIMIT_CPU`/`FSIZE`/`CORE`). Optional network isolation via `DECIMAL_VALIDATOR_SANDBOX_NET=unshare` wraps the command in `unshare -rn` (no network → closes metadata-server SSRF) when the host supports a user+net namespace; default off so it never spuriously fails where unsupported.
 - Structural-assertion directives (`response_contains:`/`response_matches:`) now slice the needle from the *stripped* expectation — leading whitespace previously extracted a corrupted needle — and empty directives fail loudly instead of vacuously passing.
 - `ClaudeCodeAdapter` synthesized frontmatter quotes the description (a first line containing a colon or quote no longer corrupts the YAML block).
 
@@ -305,7 +301,7 @@ De-branded from "Claude Code skills" to skills in general — `skillevaluation` 
 
 ## [0.1.0] — 2026-05-28
 
-Initial extraction from the DecimalAI platform. Pre-stable; breaking changes expected before v1.0.
+Initial release. Pre-stable; breaking changes expected before v1.0.
 
 ### Added
 - `skillevaluation.parser` — parses `eval.yaml` files with strict validation

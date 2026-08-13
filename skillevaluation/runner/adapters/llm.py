@@ -1,13 +1,11 @@
 """Direct-LLM adapter — single-shot completion against a provider API.
 
-This is the reference runner's *supported* adapter. It mirrors the shape
-of DecimalAI's hosted benchmark execution, which is likewise a single
-stubbed completion rather than a full agent runtime: one completion per
-arm, the skill body injected into the prompt for the with-skill arm.
-That makes pass-rate and token deltas real, while ``turns`` and
-``tool_call_count`` are honestly trivial (1 / 0) — a single-shot
-completion has no tool loop. Use an agent-runtime adapter when those
-dimensions matter.
+This is the reference runner's *supported* adapter: one single-shot
+completion per arm, the skill body injected into the prompt for the
+with-skill arm. That makes pass-rate and token deltas real, while
+``turns`` and ``tool_call_count`` are honestly trivial (1 / 0) — a
+single-shot completion has no tool loop. Use an agent-runtime adapter
+when those dimensions matter.
 
 Provider routing is by model-name prefix, with the conventional
 environment variables:
@@ -42,10 +40,8 @@ DEFAULT_MAX_TOKENS = 4096
 _ANTHROPIC_VERSION = "2023-06-01"
 _OPENAI_PREFIXES = ("gpt", "o1", "o3", "o4", "chatgpt")
 
-# Same prompt construction as the platform's reference stub: the answer is
-# captured VERBATIM (no JSON envelope) so output-format skills show their
-# lift — wrapping would clean up the bare arm and mask exactly what such
-# skills fix.
+# The answer is captured VERBATIM (no JSON envelope) so output-format skills show their
+# lift — wrapping would clean up the bare arm and mask exactly what such skills fix.
 _SYSTEM_WITH_SKILL = "You are an agent. Follow this skill:\n\n{skill_body}\n\n"
 _SYSTEM_WITHOUT_SKILL = "You are an agent."
 _PROMPT_TEMPLATE = "{system}\n\nUser: {prompt}\n\nRespond as the agent. Use the skill if relevant."

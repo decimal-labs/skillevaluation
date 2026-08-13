@@ -1,10 +1,8 @@
 """Deterministic, static safety scanner for skill content (SKILL.md body + frontmatter).
 
-**Why this exists.** After the ClawHavoc supply-chain attack (Feb 2026 — 800+ malicious skills
-on a competing registry, one with 340k installs that silently shipped the Atomic macOS Stealer
-plus a cryptominer), "is this skill *safe*?" became the first question any skill registry has to
-answer. Skills are markdown instructions, not executable code, so our attack surface is far
-smaller than a code marketplace's — but a skill body can still:
+**Why this exists.** An installed skill is a supply-chain dependency: it is text the agent is told
+to follow, so "is this skill *safe*?" is the first question a skill registry has to answer. A skill
+body is markdown instructions rather than executable code, but it can still:
 
   1. carry a **live committed credential** (an API key pasted into an example),
   2. instruct an agent to **fetch and execute** a remote payload (`curl … | sh`),
@@ -14,8 +12,7 @@ smaller than a code marketplace's — but a skill body can still:
 
 This scanner catches those, deterministically, with **no LLM call** — it's a pure function over
 text, so it's fast, free, reproducible, and unit-testable. It is the engine behind the registry's
-universal trust signal: every skill (verified or not, high-lift or zero-lift) carries a scan
-result, which is the one thing a competitor running an unvetted directory cannot show.
+universal trust signal: every skill, high-lift or zero-lift, carries a scan result.
 
 **The design constraint that makes this non-trivial.** Skills that *document* these patterns
 (a secret-scanner prints `AKIA[0-9A-Z]{16}`; a prompt-injection guide contains "ignore previous
@@ -24,14 +21,12 @@ it separates documentation (fenced code, regex patterns, example/placeholder tok
 category) from live payloads, and redacts any secret it finds rather than echoing it. The hard
 *block* decision is left to the caller; this module only classifies.
 
-**This is the open-source extraction of the DecimalAI registry's first-pass static scanner.** It
-is a pure function — no DB, no network, no LLM, standard-library only — so the exact same engine
-runs in the registry publish gate, the ``skillevaluation scan`` / ``decimalai skills scan`` local
-commands, and CI. Those copies are meant to stay identical, and ``SCANNER_VERSION`` is the drift
-check: a scan result carrying a newer version than yours means this copy is behind. Local scans
-read frontmatter (``category``, ``allowed-tools``, trigger phrases); when those are absent, local
-results may be *stricter* than the server (a security skill without ``category: security`` in its
-frontmatter can flag locally yet pass the gate) — advisory, never looser.
+**Deterministic and self-contained.** No DB, no network, no LLM, standard-library only — so the
+same engine gives the same answer from the ``skillevaluation scan`` / ``decimalai skills scan``
+commands, in CI, or embedded in another tool. ``SCANNER_VERSION`` is the drift check: a result
+carrying a newer version than yours means this copy is behind. A scan reads frontmatter
+(``category``, ``allowed-tools``, trigger phrases) when it is present; without it the result can
+be *stricter*, never looser.
 """
 
 from __future__ import annotations
@@ -43,13 +38,15 @@ from typing import Any
 # Bump when detection logic changes so stored results are comparable and a
 # backfill can re-scan everything below the current version.
 # v2 (2026-06-13): decode-and-execute (base64/openssl/xxd → shell,
-#                  exec(b64decode)) added; closes the ClawHavoc staged-payload miss.
+#                  exec(b64decode)) added — closes a staged-payload gap.
 # v3 (2026-07-05): second wave of behavioral checks — added ssrf_metadata, agent_snooping,
 #                  anti_refusal, destructive_commands, unicode_homoglyph,
-#                  tool_overreach, trigger_abuse; per-finding remediation; the talk's
-#                  4-group taxonomy (CHECK_GROUPS). All new behavioral checks are
-#                  doc-downgradable. Calibrate against a real skill corpus and
-#                  measure the false-positive rate before enabling enforcement.
+#                  tool_overreach, trigger_abuse; per-finding remediation; the
+#                  four-group taxonomy (CHECK_GROUPS). All new behavioral checks are
+#                  doc-downgradable.
+# v4 (2026-07-09): bidi split into overrides (CRITICAL, non-downgradable) vs isolates
+#                  (WARNING); caller-framing stripped from the doc-marker window;
+#                  ssrf_metadata made non-downgradable.
 SCANNER_VERSION = "4"
 
 # Severity ladder. The caller maps status → action (block / warn / show).
@@ -121,7 +118,7 @@ _SECRET_EXAMPLE_MARKERS = re.compile(
 # caution (WARNING) by default and only escalates to CRITICAL for a suspicious URL.
 # The patterns BELOW are the ones that are almost always malicious regardless of
 # host: decode-and-execute (no legit installer pipes decoded base64 into a shell —
-# this is the ClawHavoc staged-payload technique), python that execs fetched/
+# this is the staged-payload technique), python that execs fetched/
 # decoded content, or os.system shelling out to curl. (Homebrew/Chocolatey-style
 # `bash -c "$(curl …)"` / `iex(…DownloadString)` ARE documented installers and are
 # handled URL-aware in `_DOWNLOAD_EXEC` instead.)
@@ -144,7 +141,7 @@ _RCE_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 # fetch args so we can judge the URL: WARNING by default (these ARE the documented
 # installers for Homebrew, rustup, bun, chocolatey, scoop, …), CRITICAL only when
 # the URL hides its destination (raw IP / shortener / non-HTTPS) — the
-# staged-download payload shape from ClawHavoc.
+# staged-download payload shape.
 _DOWNLOAD_EXEC: list[tuple[str, re.Pattern[str]]] = [
     (
         "pipe-to-shell",
@@ -177,7 +174,7 @@ _REVERSE_SHELL_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 # Sensitive sources an exfiltration payload reaches for. Scoped tightly to the
-# AMOS/ClawHavoc *credential-theft* targets — SSH keys, cloud-cred files,
+# usual *credential-theft* targets — SSH keys, cloud-cred files,
 # keychains, browser cred stores, crypto wallets, package-registry tokens. We
 # deliberately EXCLUDE `process.env` / `os.environ` / bare `.env`: reading an env
 # var to authenticate an API call (`Bearer {os.environ['X_API_KEY']}`) is normal
@@ -274,13 +271,13 @@ _CATEGORY_DOWNGRADABLE = {"destructive_commands", "agent_snooping", "anti_refusa
 # an executable bundle.
 NON_DOWNGRADABLE_CHECKS = {"ssrf_metadata"}
 
-# ── v3 checks (2026-07-05) — curated from the SkillSpector taxonomy + the
-#    "skills marketplace for safety" talk. All doc-downgradable (behave like the
-#    RCE/reverse-shell family) so a security skill teaching these isn't blocked.
+# ── v3 checks (2026-07-05) — behavioral patterns aimed at the reading agent. All
+#    doc-downgradable except ``ssrf_metadata`` (they behave like the RCE/reverse-shell
+#    family) so a security skill teaching these isn't blocked.
 
 # SSRF / metadata + local-secret endpoints. In a skill body these are near-never
 # legitimate (an agent doesn't need the cloud metadata service or /proc/environ).
-# CRITICAL, but doc-downgradable — the benchmark pre-execution denylist stays a
+# CRITICAL and never doc-downgradable — the benchmark pre-execution denylist stays a
 # SEPARATE, unconditional second layer for the executable bundle, so a skill that
 # talks its way past this scanner still cannot execute the request.
 _SSRF_METADATA: list[tuple[str, re.Pattern[str]]] = [
@@ -314,14 +311,14 @@ _ANTI_REFUSAL = re.compile(
     r"\bdo\s*n['o]?t\s+(?:add|include|give|provide)\s+(?:any\s+)?(?:disclaimers?|warnings?|caveats?)\b)"
 )
 
-# Production-destructive shell / SQL. WARNING (doc-downgradable) — the talk's
-# lesson: don't treat all commands as equally risky, so these are a caution, not a
-# block, and a scoped/local form is deliberately excluded.
+# Production-destructive shell / SQL. WARNING (doc-downgradable) — not every
+# destructive-looking command is equally risky, so these are a caution, not a block,
+# and a scoped/local form is deliberately excluded.
 _DESTRUCTIVE: list[tuple[str, re.Pattern[str]]] = [
     # Only the near-zero-FP forms: recursive-force delete AT a root level (not ~/…),
     # raw-device writes, mkfs, unscoped DROP/TRUNCATE/DELETE, fork bomb. Common
     # everyday commands (rm -rf ~/.cache, git push --force to a branch) are left
-    # out on purpose — the talk's lesson to not treat all commands as equally risky.
+    # out on purpose — they are routine, and flagging them would be noise.
     (
         "rm -rf at a root level",
         re.compile(r"(?i)\brm\s+-[a-z]*[rf][a-z]*\s+(?:/(?![A-Za-z0-9_])|--no-preserve-root)"),
@@ -499,7 +496,7 @@ def _homoglyph_candidates(body: str, code_spans: list[tuple[int, int]]) -> list[
 
 
 def _check_tool_overreach(allowed_tools: Any) -> list[dict[str, Any]]:
-    """WARNING when ``allowed_tools`` grants a wildcard / everything — the talk's
+    """WARNING when ``allowed_tools`` grants a wildcard / everything — the
     over-broad-permission signal. Accepts a list or a comma/space string."""
     if not allowed_tools:
         return []
@@ -541,7 +538,7 @@ CHECKS_PERFORMED = [
     "prompt_injection_phrasing",
 ]
 
-# Display grouping for the "scanned for" list (the talk's four-group taxonomy).
+# Display grouping for the "scanned for" list (the four-group taxonomy).
 # Kept separate from CHECKS_PERFORMED so the checks array stays a plain string list
 # (consumers read it as-is); this maps check name → group for the UI/docs.
 CHECK_GROUPS = {
@@ -579,7 +576,7 @@ def scan_skill_content(
     ``Skill.safety_status`` column)::
 
         {
-          "scanned_at": "...Z", "scanner_version": "1",
+          "scanned_at": "...Z", "scanner_version": "4",
           "status": "clean|flagged|blocked",
           "summary": "No issues found." | "1 critical, 2 warnings",
           "checks": [...],            # what we looked for (transparency)
@@ -820,9 +817,9 @@ def scan_skill_content(
 
     # ── v3 checks ──────────────────────────────────────────────────────
 
-    # SSRF / metadata + /proc/environ — CRITICAL, doc-downgradable (behaves like the
-    # RCE family). The benchmark pre-execution denylist stays a separate unconditional
-    # layer for executable bundles; this covers the skill body / CLI surface.
+    # SSRF / metadata + /proc/environ — CRITICAL and never downgraded
+    # (NON_DOWNGRADABLE_CHECKS). The caller's pre-execution denylist stays a separate
+    # unconditional layer for executable bundles; this covers the skill body / CLI surface.
     _behavioral(_SSRF_METADATA, "ssrf_metadata", "Cloud metadata / SSRF")
 
     # Agent-config snooping — reading another agent's config / MCP manifest.

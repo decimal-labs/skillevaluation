@@ -90,7 +90,6 @@ strict = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Coverage gate: suite measures 89% (line+branch) on the clean tree; the gate
-# is pinned to 80 (deliberate headroom, so the build stays
-# green now and can be ratcheted up as coverage tightens).
+# Coverage gate: suite measures 84% (line+branch) on the clean tree; the gate is
+# pinned at 80 - ratchet up as coverage tightens.
 addopts = "-v --tb=short --cov=skillevaluation --cov-branch --cov-fail-under=80"

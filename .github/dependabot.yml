@@ -1,7 +1,6 @@
 version: 2
-# skillevaluation had no Dependabot — added for parity with the
-# other repos (it ships to PyPI + the backend installs it from source). github-actions
-# majors are ignored (take them deliberately + tested); minor/patch + pip flow normally.
+# Weekly pip + github-actions updates. Action majors are ignored — take them
+# deliberately, with a test run; minor/patch and pip flow normally.
 updates:
   - package-ecosystem: "pip"
     directory: "/"

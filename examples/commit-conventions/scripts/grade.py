@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Reusable text grader for registry skill eval cases.
 
-Replicates the harvester's graders (scripts/skill_harvester.py) so an official
-skill's A/B reproduces its harvested lift. Reads the model output from the staged
-`response.txt`, looks up the per-case expectation in a bundled spec JSON, and exits
-0 (pass) / 1 (fail) / 2 (bad spec). Stdlib only — runs under the sandbox's `python3`.
+Reads the model output from the staged `response.txt`, looks up the per-case
+expectation in a bundled spec JSON, and exits 0 (pass) / 1 (fail) / 2 (bad spec).
+Stdlib only — runs under the sandbox's `python3`.
 
     python3 scripts/grade.py scripts/grading_spec.json <case-name>
 
