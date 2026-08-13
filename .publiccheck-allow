@@ -13,3 +13,15 @@
 # placeholder), and the comments in safety.py explain that rule. Any OTHER
 # AKIA-shaped string stays blocked — this entry pins the one literal.
 ^1a-live-secret .*AKIAIOSFODNN7EXAMPLE
+
+# safety.py:95 is a COMMENT explaining that the bare PEM header, with no key body
+# after it, is not a leak — which is exactly what the scanner's own rule on line 99
+# encodes (`-----BEGIN … PRIVATE KEY-----[\r\n]+[A-Za-z0-9+/=\s]{100,}`, requiring
+# the body across the newline).
+#
+# The publish gate's copy of that rule was broken until 2026-08-12: it demanded the
+# body on the SAME line, which grep can never match, so real private keys passed.
+# Fixing it to the bare header — correct, and what commit-guard.sh always had —
+# surfaced this comment. Pinned to the one file and the one rule; any OTHER file in
+# this repo carrying a PEM header still fails.
+^1a-live-secret skillevaluation/safety\.py:.*BEGIN RSA PRIVATE KEY
