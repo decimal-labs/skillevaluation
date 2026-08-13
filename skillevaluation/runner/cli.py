@@ -419,7 +419,10 @@ def _format_scan_text(per: list[tuple[str, str, dict[str, Any]]]) -> str:
         icon = _SCAN_ICON.get(res["status"], "?")
         lines.append(f"  {icon} {name}: {res['status']} — {res['summary']}")
         for fnd in res.get("findings", []):
+            # A metadata finding has no body line — show the field it came from instead.
             loc = f":{fnd['line']}" if fnd.get("line") else ""
+            if not loc and fnd.get("field"):
+                loc = f" ({fnd['field']})"
             lines.append(f"      [{fnd['severity']}] {fnd['check']}{loc} — {fnd['message']}")
             if fnd.get("remediation"):
                 lines.append(f"        fix: {fnd['remediation']}")

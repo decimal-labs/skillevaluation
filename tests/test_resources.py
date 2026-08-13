@@ -59,6 +59,22 @@ def test_every_spec_reads_as_markdown(name):
     assert text.lstrip().startswith("#")
 
 
+def test_inlined_judge_result_mirror_matches_canonical_schema():
+    """``test-case-result``'s ``$defs.judgeResult`` claims to be a mirror of
+    judge-result.schema.json, inlined so validation resolves offline. A mirror that
+    silently drops a property is worse than no mirror: it is the copy naive validators
+    actually enforce. ``errored`` in particular is normative — runners MUST roll it up
+    into the arm's errored count — so a document carrying it has to survive both."""
+    canonical = load_schema("judge-result")
+    mirror = load_schema("test-case-result")["$defs"]["judgeResult"]
+
+    for key in ("type", "required", "additionalProperties"):
+        assert mirror[key] == canonical[key], f"mirror disagrees on {key!r}"
+    assert set(mirror["properties"]) == set(canonical["properties"])
+    for prop, subschema in canonical["properties"].items():
+        assert mirror["properties"][prop] == subschema, f"mirror drifted on {prop!r}"
+
+
 def test_missing_resource_raises_with_searched_paths():
     with pytest.raises(FileNotFoundError, match="searched"):
         load_schema("no-such-schema")

@@ -4,6 +4,25 @@ All notable changes to `skillevaluation` are documented here. Format follows [Ke
 
 ## [Unreleased]
 
+Safety scanner — two detection gaps closed (`SCANNER_VERSION` 4 → 5). Behavior change:
+some content that scanned `clean` before now scans `flagged` or `blocked`.
+
+- **A placeholder marker can no longer delete a credential finding.** `live_secret` is the
+  only CRITICAL check that catches a committed live key, and any of `test`, `my`, `your`,
+  `example`, `fake` within ±30 chars of the match used to skip it silently — no finding at
+  any severity. Two fixes: (a) those five are word-anchored in the surrounding **prose**, so
+  they no longer fire inside "latest", "MySQL", "protest" (the unanchored form still applies
+  **inside the value**, where `AKIAIOSFODNN7EXAMPLE` is decisive); (b) a suppressed match is
+  now **recorded** — INFO when the marker is inside the value (status stays `clean`), WARNING
+  when the suppression rests on nearby prose (status `flagged`), never dropped.
+- **Every check now scans `name` + `description`, not just the body.** Only the two
+  credential checks looked at metadata; the ten behavioural / unicode / URL / injection
+  checks read the body alone, so a reverse shell, SSRF endpoint, or injection phrase parked
+  in a skill's description — the text a router shows an agent first — scanned `clean`.
+  Metadata findings carry `"field": "name/description"` instead of `"line"`, so a payload in
+  the frontmatter is never attributed to an unrelated body line. `skillevaluation scan` text
+  output prints the field where it would print a line number.
+
 ## [0.7.0] — 2026-07-31
 
 Measurement-honesty fix. One behavior change in the reference runner (it makes numbers

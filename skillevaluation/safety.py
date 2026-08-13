@@ -47,7 +47,15 @@ from typing import Any
 # v4 (2026-07-09): bidi split into overrides (CRITICAL, non-downgradable) vs isolates
 #                  (WARNING); caller-framing stripped from the doc-marker window;
 #                  ssrf_metadata made non-downgradable.
-SCANNER_VERSION = "4"
+# v5 (2026-08-12): two detection gaps closed. (a) The example/placeholder markers that
+#                  suppress a live-credential CRITICAL are word-anchored (`test` no
+#                  longer fires inside "latest", `my` inside "MySQL"), and a suppressed
+#                  match is now RECORDED at INFO/WARNING instead of dropped silently —
+#                  prose can no longer delete a credential finding. (b) The whole
+#                  behavioural / unicode / URL / injection sweep runs over `name` +
+#                  `description` as well as the body, so a payload in a skill's metadata
+#                  is seen; metadata findings carry `field` instead of `line`.
+SCANNER_VERSION = "5"
 
 # Severity ladder. The caller maps status → action (block / warn / show).
 CRITICAL = "critical"
@@ -107,8 +115,29 @@ _DB_URL_TEMPLATE = re.compile(
 )
 
 # Tokens that mark a "secret-looking" match as a placeholder/example, not a leak.
-_SECRET_EXAMPLE_MARKERS = re.compile(
+#
+# TWO regexes, because the same word means different things in the two places we look:
+#
+#   * inside the matched VALUE (`AKIAIOSFODNN7EXAMPLE`, `sk_live_xxxxxxxxxxxx`) a bare
+#     substring is decisive — a credential has no word breaks, and nobody's real key
+#     spells "EXAMPLE". So the value regex stays unanchored (it is the pre-2026-08-12
+#     pattern, unchanged).
+#   * in the surrounding PROSE it is not. Unanchored, `test` matched inside "latest" /
+#     "greatest" / "protest", `my` inside "MySQL" / "economy", `fake` / `example`
+#     inside any longer word — so an ordinary English sentence within ±30 chars of a
+#     real key disabled the only CRITICAL check that catches a committed live
+#     credential. The prose regex anchors those five to word boundaries. `your` / `my`
+#     keep their separator form (`your_api_key`, `my-token`), the most common
+#     placeholder shape; only the bare-substring match is dropped. The unambiguous
+#     alternatives (xxx+, changeme, deadbeef, <…>, {{ }}, long zero runs, notreal, …)
+#     are left as they were — they do not occur in ordinary prose.
+_SECRET_VALUE_MARKERS = re.compile(
     r"(?i)(example|sample|placeholder|your[_\-]?|my[_\-]?|xxx+|redact|dummy|fake|test|\bn/?a\b|"
+    r"\b0{6,}|\bdeadbeef|123456|abcdef|changeme|<[^>]+>|\{\{|\}\}|\bnotreal)"
+)
+_SECRET_EXAMPLE_MARKERS = re.compile(
+    r"(?i)(\bexamples?\b|sample|placeholder|\byour(?:\b|[_\-])|\bmy(?:\b|[_\-])|xxx+|redact|dummy|"
+    r"\bfakes?\b|\btests?\b|\bn/?a\b|"
     r"\b0{6,}|\bdeadbeef|123456|abcdef|changeme|<[^>]+>|\{\{|\}\}|\bnotreal)"
 )
 
@@ -402,10 +431,13 @@ def _in_spans(idx: int, spans: list[tuple[int, int]]) -> bool:
 
 
 def _looks_like_documentation(
-    *, check: str, category: str | None, body: str, match_start: int,
+    *, check: str, category: str | None, text: str, match_start: int,
     code_spans: list[tuple[int, int]]
 ) -> bool:
     """Heuristic: is this match teaching about a pattern, not instructing it?
+
+    ``text`` is the surface being scanned — the skill body, or the name+description
+    metadata; the doc-marker window is taken from whichever one the match came from.
 
     True when the surrounding prose carries doc markers ("example of", "detect",
     "never", "malicious", …) within ±400 chars — the guard that keeps a
@@ -434,8 +466,8 @@ def _looks_like_documentation(
     # The rule this encodes: a scanner must never read its own attribution header as
     # testimony about the thing it is attributing.
     lo = max(0, match_start - 400)
-    hi = min(len(body), match_start + 400)
-    if _DOC_MARKERS.search(_strip_caller_framing(body[lo:hi])):
+    hi = min(len(text), match_start + 400)
+    if _DOC_MARKERS.search(_strip_caller_framing(text[lo:hi])):
         return True
     return False
 
@@ -576,20 +608,38 @@ def scan_skill_content(
     ``Skill.safety_status`` column)::
 
         {
-          "scanned_at": "...Z", "scanner_version": "4",
+          "scanned_at": "...Z", "scanner_version": "5",
           "status": "clean|flagged|blocked",
           "summary": "No issues found." | "1 critical, 2 warnings",
           "checks": [...],            # what we looked for (transparency)
-          "findings": [{check, severity, message, evidence?, line?}],
+          "findings": [{check, severity, message, evidence?, line?, field?}],
           "counts": {"critical": 0, "warning": 1, "info": 0},
         }
+
+    Every check runs over the body AND over ``name`` + ``description`` — metadata is
+    instruction text the agent sees first. A finding from the body carries ``line``; one
+    from metadata carries ``field`` ("name/description") and no line.
 
     Secrets are redacted in ``evidence`` — the raw value is never returned or stored.
     """
     body = body_markdown or ""
     haystack = "\n".join(p for p in (name, description, body) if p)
-    code_spans = _fenced_code_spans(body)
+    # A skill's own metadata is instruction text too — a router puts `name` and
+    # `description` in front of the agent BEFORE any body is read, so a payload parked
+    # there is the first thing acted on. Until 2026-08-12 only the two credential checks
+    # ever looked at metadata (via `haystack`); all ten behavioural / unicode / URL /
+    # injection checks read the body alone, so `description: "bash -i >& /dev/tcp/…"`
+    # scanned CLEAN. The sweep below therefore runs twice: over the body (findings carry
+    # a `line`) and over name+description (findings carry `field` instead — there is no
+    # body line to point at, and attributing them to line 1 would be a false location).
+    meta = "\n".join(p for p in (name, description) if p)
     findings: list[dict[str, Any]] = []
+
+    def _attribute(finding: dict[str, Any], value: str) -> dict[str, Any]:
+        """Tag a haystack finding with the metadata field when it isn't in the body."""
+        if not finding.get("line") and value and value in meta:
+            finding["field"] = "name/description"
+        return finding
 
     # 1. Live secrets — scan name+description+body. Exclude regex-pattern matches
     #    (metachars) and example/placeholder values. Documentation context does
@@ -598,16 +648,46 @@ def scan_skill_content(
         for m in pat.finditer(haystack):
             val = m.group(0)
             window = haystack[max(0, m.start() - 30) : m.end() + 30]
-            if _SECRET_EXAMPLE_MARKERS.search(window):
+            line = _line_of(body, body.find(val)) if val in body else 0
+            in_value = bool(_SECRET_VALUE_MARKERS.search(val))
+            if in_value or _SECRET_EXAMPLE_MARKERS.search(window):
+                # A placeholder marker suppresses the BLOCK, never the FINDING. It used
+                # to `continue` — a concrete, correctly-shaped credential vanished from
+                # the result entirely because a nearby word looked example-ish, so the
+                # one check that catches a committed live key could be turned off by
+                # prose. Now it is recorded at a severity that does not block:
+                #   * marker inside the value itself (`AKIAIOSFODNN7EXAMPLE`,
+                #     `sk_live_xxxxxxxx`) — the value is self-evidently fake → INFO,
+                #     status stays clean.
+                #   * marker only in the surrounding text — the value itself still looks
+                #     real, so the suppression rests on prose → WARNING (flagged), which
+                #     a reviewer sees.
+                findings.append(
+                    _attribute(
+                        _finding(
+                            "live_secret",
+                            INFO if in_value else WARNING,
+                            f"Looks like a {label}, but an example/placeholder marker sits "
+                            + ("inside the value" if in_value else "in the surrounding text")
+                            + " — recorded, not blocked. Confirm it is not a live credential.",
+                            evidence=f"{label}: {_redact(val)}",
+                            line=line,
+                        ),
+                        val,
+                    )
+                )
                 continue
             findings.append(
-                _finding(
-                    "live_secret",
-                    CRITICAL,
-                    f"Looks like a live {label} committed in the skill text. "
-                    "Remove it and rotate the credential before publishing.",
-                    evidence=f"{label}: {_redact(val)}",
-                    line=_line_of(body, body.find(val)) if val in body else 0,
+                _attribute(
+                    _finding(
+                        "live_secret",
+                        CRITICAL,
+                        f"Looks like a live {label} committed in the skill text. "
+                        "Remove it and rotate the credential before publishing.",
+                        evidence=f"{label}: {_redact(val)}",
+                        line=line,
+                    ),
+                    val,
                 )
             )
 
@@ -615,295 +695,326 @@ def scan_skill_content(
     # almost all are template DSNs (user:password@localhost). Skip the obvious
     # templates entirely; flag the rest as a caution worth a human glance.
     for m in _DB_URL_WITH_PASSWORD.finditer(haystack):
-        if _DB_URL_TEMPLATE.search(m.group(0)) or _SECRET_EXAMPLE_MARKERS.search(m.group(0)):
+        if _DB_URL_TEMPLATE.search(m.group(0)) or _SECRET_VALUE_MARKERS.search(m.group(0)):
             continue
         findings.append(
-            _finding(
-                "live_secret",
-                WARNING,
-                "Database connection string with an embedded password — make sure this is a "
-                "placeholder, not a live credential.",
-                evidence=_redact(m.group(0)),
-                line=_line_of(body, body.find(m.group(0))) if m.group(0) in body else 0,
+            _attribute(
+                _finding(
+                    "live_secret",
+                    WARNING,
+                    "Database connection string with an embedded password — make sure this is a "
+                    "placeholder, not a live credential.",
+                    evidence=_redact(m.group(0)),
+                    line=_line_of(body, body.find(m.group(0))) if m.group(0) in body else 0,
+                ),
+                m.group(0),
             )
         )
 
-    # 2/3/4. Behavioral payloads — RCE, reverse shell, exfiltration. These are the
-    #    "is this skill malicious?" signals. CRITICAL when the skill instructs the
-    #    agent to do it; downgraded to WARNING when it's clearly documentation
-    #    (security skill, or fenced+doc-markers) so we never block defenders.
-    def _behavioral(
-        patterns: list[tuple[str, re.Pattern[str]]],
-        check: str,
-        noun: str,
-        *,
-        base: str = CRITICAL,
-        downgraded: str = WARNING,
-        instruction_suffix: str = " — a skill must not instruct an agent to do this.",
-    ) -> None:
-        for label, pat in patterns:
-            for m in pat.finditer(body):
+    # ── The content sweep. Runs once over the body, once over name+description. ──
+    #
+    # `text` is whichever surface is being scanned; `field` names it when it is NOT the
+    # body, in which case findings are attributed to the field instead of a line number.
+    def _sweep(text: str, field: str = "") -> None:
+        code_spans = _fenced_code_spans(text)
+        _first = len(findings)
+
+        # 2/3/4. Behavioral payloads — RCE, reverse shell, exfiltration. These are the
+        #    "is this skill malicious?" signals. CRITICAL when the skill instructs the
+        #    agent to do it; downgraded to WARNING when it's clearly documentation
+        #    (security skill, or fenced+doc-markers) so we never block defenders.
+        def _behavioral(
+            patterns: list[tuple[str, re.Pattern[str]]],
+            check: str,
+            noun: str,
+            *,
+            base: str = CRITICAL,
+            downgraded: str = WARNING,
+            instruction_suffix: str = " — a skill must not instruct an agent to do this.",
+        ) -> None:
+            for label, pat in patterns:
+                for m in pat.finditer(text):
+                    doc = _looks_like_documentation(
+                        check=check, category=category, text=text,
+                        match_start=m.start(), code_spans=code_spans,
+                    )
+                    sev = downgraded if doc else base
+                    suffix = (
+                        " (documented as an example — recorded, not blocked)"
+                        if doc
+                        else instruction_suffix
+                    )
+                    findings.append(
+                        _finding(
+                            check,
+                            sev,
+                            f"{noun} pattern ({label}){suffix}",
+                            evidence=m.group(0),
+                            line=_line_of(text, m.start()),
+                        )
+                    )
+
+        _behavioral(_RCE_PATTERNS, "remote_code_execution", "Remote code execution")
+        _behavioral(_REVERSE_SHELL_PATTERNS, "reverse_shell", "Reverse shell")
+
+        # Download-and-execute (pipe-to-shell, `sh -c "$(curl …)"`, PowerShell
+        # IEX-web): WARNING by default (it executes remote code — worth a caution
+        # badge, and these are the documented installers for Homebrew/rustup/bun/…),
+        # CRITICAL only when the URL hides its destination. Doc context still
+        # downgrades CRITICAL→WARNING so a security skill can show it as an example.
+        _seen_dlx: set[int] = set()
+        for _label, _pat in _DOWNLOAD_EXEC:
+            for m in _pat.finditer(text):
+                if m.start() in _seen_dlx:  # don't double-count overlapping forms
+                    continue
+                _seen_dlx.add(m.start())
+                suspicious = _pipe_to_shell_is_suspicious(m.group(1) if m.groups() else "")
                 doc = _looks_like_documentation(
-                    check=check, category=category, body=body,
+                    check="remote_code_execution", category=category, text=text,
                     match_start=m.start(), code_spans=code_spans,
                 )
-                sev = downgraded if doc else base
-                suffix = (
-                    " (documented as an example — recorded, not blocked)"
-                    if doc
-                    else instruction_suffix
-                )
+                if suspicious and not doc:
+                    sev, msg = (
+                        CRITICAL,
+                        (
+                            "Fetches a script from a hidden/untrusted URL (raw IP, shortener, or non-HTTPS) "  # noqa: E501
+                            "and executes it — a staged-download payload. A skill must not do this."
+                        ),
+                    )
+                else:
+                    sev, msg = (
+                        WARNING,
+                        (
+                            "Instructs the agent to fetch a remote script and run it. Common "
+                            "for tool installers, but it executes unreviewed remote code — "
+                            "verify the source."
+                        ),
+                    )
                 findings.append(
                     _finding(
-                        check,
+                        "remote_code_execution",
                         sev,
-                        f"{noun} pattern ({label}){suffix}",
+                        msg,
                         evidence=m.group(0),
-                        line=_line_of(body, m.start()),
+                        line=_line_of(text, m.start()),
                     )
                 )
 
-    _behavioral(_RCE_PATTERNS, "remote_code_execution", "Remote code execution")
-    _behavioral(_REVERSE_SHELL_PATTERNS, "reverse_shell", "Reverse shell")
-
-    # Download-and-execute (pipe-to-shell, `sh -c "$(curl …)"`, PowerShell
-    # IEX-web): WARNING by default (it executes remote code — worth a caution
-    # badge, and these are the documented installers for Homebrew/rustup/bun/…),
-    # CRITICAL only when the URL hides its destination. Doc context still
-    # downgrades CRITICAL→WARNING so a security skill can show it as an example.
-    _seen_dlx: set[int] = set()
-    for _label, _pat in _DOWNLOAD_EXEC:
-        for m in _pat.finditer(body):
-            if m.start() in _seen_dlx:  # don't double-count overlapping forms
+        # Exfiltration needs BOTH a sensitive source and an egress sink near it —
+        # AND the source must be read as *data*, not used as an auth identity. A
+        # legit deploy/monitoring skill does `ssh -i ~/.ssh/id_rsa host`; an exfil
+        # payload does `cat ~/.ssh/id_rsa | curl …`. Skip identity-flag usage.
+        for sm in _SENSITIVE_SOURCE.finditer(text):
+            prefix = text[max(0, sm.start() - 14) : sm.start()]
+            if re.search(r"(?i)(?:-i|--identity|--key|identityfile|-CertificateFile)\s*$", prefix):
                 continue
-            _seen_dlx.add(m.start())
-            suspicious = _pipe_to_shell_is_suspicious(m.group(1) if m.groups() else "")
+            win_lo, win_hi = max(0, sm.start() - 200), min(len(text), sm.end() + 200)
+            if _EGRESS_SINK.search(text[win_lo:win_hi]):
+                doc = _looks_like_documentation(
+                    check="data_exfiltration", category=category, text=text,
+                    match_start=sm.start(), code_spans=code_spans,
+                )
+                sev = WARNING if doc else CRITICAL
+                findings.append(
+                    _finding(
+                        "data_exfiltration",
+                        sev,
+                        "Reads a sensitive source (keys / keychain / env / wallet) and sends "
+                        "it to a network sink nearby"
+                        + ("" if not doc else " — documented, not blocked")
+                        + ".",
+                        evidence=sm.group(0),
+                        line=_line_of(text, sm.start()),
+                    )
+                )
+
+        # 5. Obfuscated unicode. Bidi OVERRIDES/EMBEDDINGS (U+202A–U+202E) have
+        #    essentially no legitimate use in a skill (Trojan Source) → CRITICAL
+        #    regardless of context. Bidi ISOLATES and zero-width → WARNING.
+        _bidi = _BIDI_OVERRIDE.search(text)
+        if _bidi:
+            findings.append(
+                _finding(
+                    "obfuscated_unicode",
+                    CRITICAL,
+                    "Contains bidirectional-override unicode that can hide instructions "
+                    "from a human reviewer (a 'Trojan Source' technique).",
+                    line=_line_of(text, _bidi.start()),
+                )
+            )
+        # Zero-width AND bidi-isolate chars are WARNING — skip matches inside code
+        # (fenced OR inline `…`): a data/i18n/security skill legitimately DOCUMENTS a
+        # char to strip (a BOM `﻿`) or an isolate to use (`U+2068`). Overrides above
+        # stay CRITICAL everywhere (Trojan Source lives in code, so never skipped).
+        _inline_code = [(m.start(), m.end()) for m in re.finditer(r"`[^`\n]+`", text)]
+        _code_all = list(code_spans) + _inline_code
+        _zw_hits = [m for m in _ZERO_WIDTH.finditer(text) if not _in_spans(m.start(), _code_all)]
+        if _zw_hits:
+            findings.append(
+                _finding(
+                    "obfuscated_unicode",
+                    WARNING,
+                    f"Contains {len(_zw_hits)} zero-width unicode character(s) outside code — often used to obfuscate text.",  # noqa: E501
+                    line=_line_of(text, _zw_hits[0].start()),
+                )
+            )
+        _iso_hits = [m for m in _BIDI_ISOLATE.finditer(text) if not _in_spans(m.start(), _code_all)]
+        if _iso_hits:
+            findings.append(
+                _finding(
+                    "obfuscated_unicode",
+                    WARNING,
+                    f"Contains {len(_iso_hits)} bidi-isolate character(s) outside code — "
+                    "legitimate for right-to-left text, but name them as U+2068… rather "
+                    "than embedding live controls.",
+                    line=_line_of(text, _iso_hits[0].start()),
+                )
+            )
+
+        # 6. Opaque blobs (staged payloads), outside legitimate fenced code.
+        for m in _OPAQUE_BLOB.finditer(text):
+            if _in_spans(m.start(), code_spans):
+                continue
+            findings.append(
+                _finding(
+                    "opaque_blob",
+                    WARNING,
+                    "Long opaque base64/hex blob in prose — can hide an encoded payload.",
+                    evidence=m.group(0)[:24] + "…",
+                    line=_line_of(text, m.start()),
+                )
+            )
+
+        # 7. Suspicious URLs (shorteners / raw IPs hide a fetch destination).
+        for label, pat in (("URL shortener", _SHORTENER), ("raw-IP URL", _RAW_IP_URL)):
+            for m in pat.finditer(text):
+                findings.append(
+                    _finding(
+                        "suspicious_url",
+                        WARNING,
+                        f"{label} obscures where a fetch would go.",
+                        evidence=m.group(0),
+                        line=_line_of(text, m.start()),
+                    )
+                )
+
+        # 8. Injection phrasing — INFO only.
+        for m in _INJECTION_PHRASE.finditer(text):
+            findings.append(
+                _finding(
+                    "prompt_injection_phrasing",
+                    INFO,
+                    "Contains instruction-override phrasing. Expected in skills that teach "
+                    "injection resistance; informational only.",
+                    evidence=m.group(0),
+                    line=_line_of(text, m.start()),
+                )
+            )
+
+        # ── v3 checks ──────────────────────────────────────────────────────
+
+        # SSRF / metadata + /proc/environ — CRITICAL and never downgraded
+        # (NON_DOWNGRADABLE_CHECKS). The caller's pre-execution denylist stays a separate
+        # unconditional layer for executable bundles; this covers the skill body /
+        # metadata / CLI surface.
+        _behavioral(_SSRF_METADATA, "ssrf_metadata", "Cloud metadata / SSRF")
+
+        # Agent-config snooping — reading another agent's config / MCP manifest.
+        for m in _AGENT_SNOOP.finditer(text):
             doc = _looks_like_documentation(
-                check="remote_code_execution", category=category, body=body,
+                check="agent_snooping", category=category, text=text,
                 match_start=m.start(), code_spans=code_spans,
             )
-            if suspicious and not doc:
-                sev, msg = (
-                    CRITICAL,
-                    (
-                        "Fetches a script from a hidden/untrusted URL (raw IP, shortener, or non-HTTPS) "  # noqa: E501
-                        "and executes it — a staged-download payload. A skill must not do this."
-                    ),
-                )
-            else:
-                sev, msg = (
-                    WARNING,
-                    (
-                        "Instructs the agent to fetch a remote script and run it. Common for tool "
-                        "installers, but it executes unreviewed remote code — verify the source."
-                    ),
-                )
             findings.append(
                 _finding(
-                    "remote_code_execution",
-                    sev,
-                    msg,
+                    "agent_snooping",
+                    WARNING,
+                    "Reads another agent's config / installed skills / MCP manifest"
+                    + (
+                        " — documented, not blocked"
+                        if doc
+                        else " — a skill shouldn't snoop on the host's other agents"
+                    )
+                    + ".",
                     evidence=m.group(0),
-                    line=_line_of(body, m.start()),
+                    line=_line_of(text, m.start()),
                 )
             )
 
-    # Exfiltration needs BOTH a sensitive source and an egress sink near it —
-    # AND the source must be read as *data*, not used as an auth identity. A
-    # legit deploy/monitoring skill does `ssh -i ~/.ssh/id_rsa host`; an exfil
-    # payload does `cat ~/.ssh/id_rsa | curl …`. Skip identity-flag usage.
-    for sm in _SENSITIVE_SOURCE.finditer(body):
-        prefix = body[max(0, sm.start() - 14) : sm.start()]
-        if re.search(r"(?i)(?:-i|--identity|--key|identityfile|-CertificateFile)\s*$", prefix):
-            continue
-        win_lo, win_hi = max(0, sm.start() - 200), min(len(body), sm.end() + 200)
-        if _EGRESS_SINK.search(body[win_lo:win_hi]):
-            doc = _looks_like_documentation(
-                check="data_exfiltration", category=category, body=body,
-                match_start=sm.start(), code_spans=code_spans,
-            )
-            sev = WARNING if doc else CRITICAL
+        # Anti-refusal / jailbreak instructions. Downgrade ONLY on the security-category
+        # signal — the generic doc-marker window can't be used here because the trigger
+        # words themselves ("never", "do not", "without") ARE doc markers, so a real
+        # jailbreak would always self-downgrade.
+        _anti_doc = (category or "").strip().lower() in _SECURITY_CATEGORIES
+        for m in _ANTI_REFUSAL.finditer(text):
             findings.append(
                 _finding(
-                    "data_exfiltration",
-                    sev,
-                    "Reads a sensitive source (keys / keychain / env / wallet) and sends it to a "
-                    "network sink nearby" + ("" if not doc else " — documented, not blocked") + ".",
-                    evidence=sm.group(0),
-                    line=_line_of(body, sm.start()),
-                )
-            )
-
-    # 5. Obfuscated unicode. Bidi OVERRIDES/EMBEDDINGS (U+202A–U+202E) have
-    #    essentially no legitimate use in a skill (Trojan Source) → CRITICAL
-    #    regardless of context. Bidi ISOLATES and zero-width → WARNING.
-    _bidi = _BIDI_OVERRIDE.search(body)
-    if _bidi:
-        findings.append(
-            _finding(
-                "obfuscated_unicode",
-                CRITICAL,
-                "Contains bidirectional-override unicode that can hide instructions from a human "
-                "reviewer (a 'Trojan Source' technique).",
-                line=_line_of(body, _bidi.start()),
-            )
-        )
-    # Zero-width AND bidi-isolate chars are WARNING — skip matches inside code
-    # (fenced OR inline `…`): a data/i18n/security skill legitimately DOCUMENTS a
-    # char to strip (a BOM `﻿`) or an isolate to use (`U+2068`). Overrides above
-    # stay CRITICAL everywhere (Trojan Source lives in code, so never skipped).
-    _code_all = list(code_spans) + [(m.start(), m.end()) for m in re.finditer(r"`[^`\n]+`", body)]
-    _zw_hits = [m for m in _ZERO_WIDTH.finditer(body) if not _in_spans(m.start(), _code_all)]
-    if _zw_hits:
-        findings.append(
-            _finding(
-                "obfuscated_unicode",
-                WARNING,
-                f"Contains {len(_zw_hits)} zero-width unicode character(s) outside code — often used to obfuscate text.",  # noqa: E501
-                line=_line_of(body, _zw_hits[0].start()),
-            )
-        )
-    _iso_hits = [m for m in _BIDI_ISOLATE.finditer(body) if not _in_spans(m.start(), _code_all)]
-    if _iso_hits:
-        findings.append(
-            _finding(
-                "obfuscated_unicode",
-                WARNING,
-                f"Contains {len(_iso_hits)} bidi-isolate character(s) outside code — legitimate for "  # noqa: E501
-                "right-to-left text, but name them as U+2068… rather than embedding live controls.",
-                line=_line_of(body, _iso_hits[0].start()),
-            )
-        )
-
-    # 6. Opaque blobs (staged payloads), outside legitimate fenced code.
-    for m in _OPAQUE_BLOB.finditer(body):
-        if _in_spans(m.start(), code_spans):
-            continue
-        findings.append(
-            _finding(
-                "opaque_blob",
-                WARNING,
-                "Long opaque base64/hex blob in prose — can hide an encoded payload.",
-                evidence=m.group(0)[:24] + "…",
-                line=_line_of(body, m.start()),
-            )
-        )
-
-    # 7. Suspicious URLs (shorteners / raw IPs hide a fetch destination).
-    for label, pat in (("URL shortener", _SHORTENER), ("raw-IP URL", _RAW_IP_URL)):
-        for m in pat.finditer(body):
-            findings.append(
-                _finding(
-                    "suspicious_url",
-                    WARNING,
-                    f"{label} obscures where a fetch would go.",
+                    "anti_refusal",
+                    INFO if _anti_doc else WARNING,
+                    "Instructs the agent to drop its refusals / safety guidelines"
+                    + (" — documented, informational" if _anti_doc else " — reads as a jailbreak")
+                    + ".",
                     evidence=m.group(0),
-                    line=_line_of(body, m.start()),
+                    line=_line_of(text, m.start()),
                 )
             )
 
-    # 8. Injection phrasing — INFO only.
-    for m in _INJECTION_PHRASE.finditer(body):
-        findings.append(
-            _finding(
-                "prompt_injection_phrasing",
-                INFO,
-                "Contains instruction-override phrasing. Expected in skills that teach injection "
-                "resistance; informational only.",
-                evidence=m.group(0),
-                line=_line_of(body, m.start()),
-            )
+        # Production-destructive commands (rm -rf /, dd to a device, unscoped DROP, …).
+        #
+        # Base severity is WARNING with a doc-downgrade, deliberately NOT
+        # CRITICAL-unless-downgraded. The difference is who holds the last lever:
+        # CRITICAL blocks, so the doc-downgrade would be the only thing standing between a
+        # match and a block — and that downgrade consults `category`, a free-form field the
+        # AUTHOR sets on their own content. At WARNING base the lever is gone rather than
+        # narrowed: warning → FLAGGED, never BLOCKED, so no value of `category` can decide
+        # whether the skill publishes. The category downgrade still softens WARNING → INFO
+        # on genuine documentation.
+        #
+        # WARNING also matches how the check actually fires. Measured across every readable
+        # public skill in a multi-thousand-skill corpus, the handful of matches that leaned
+        # on the category lever were all defenders, not attackers: a quoted `rm -rf /` in a
+        # Perl injection warning, a Kali `dd` writing an install image, two forensics
+        # denylists. Flagging those is right; blocking them is not.
+        _behavioral(
+            _DESTRUCTIVE,
+            "destructive_commands",
+            "Destructive command",
+            base=WARNING,
+            downgraded=INFO,
+            instruction_suffix=(
+                " — destructive if run against a production target; review the context."
+            ),
         )
 
-    # ── v3 checks ──────────────────────────────────────────────────────
-
-    # SSRF / metadata + /proc/environ — CRITICAL and never downgraded
-    # (NON_DOWNGRADABLE_CHECKS). The caller's pre-execution denylist stays a separate
-    # unconditional layer for executable bundles; this covers the skill body / CLI surface.
-    _behavioral(_SSRF_METADATA, "ssrf_metadata", "Cloud metadata / SSRF")
-
-    # Agent-config snooping — reading another agent's config / MCP manifest.
-    for m in _AGENT_SNOOP.finditer(body):
-        doc = _looks_like_documentation(
-            check="agent_snooping", category=category, body=body,
-            match_start=m.start(), code_spans=code_spans,
-        )
-        findings.append(
-            _finding(
-                "agent_snooping",
-                WARNING,
-                "Reads another agent's config / installed skills / MCP manifest"
-                + (
-                    " — documented, not blocked"
-                    if doc
-                    else " — a skill shouldn't snoop on the host's other agents"
+        # Mixed-script homoglyph inside a command/URL token — check URLs + fenced code.
+        _homoglyph_seen: set[int] = set()
+        for span_start, span_text in _homoglyph_candidates(text, code_spans):
+            if span_start in _homoglyph_seen:
+                continue
+            if _CYR_GREEK.search(span_text) and _ASCII_LETTER.search(span_text):
+                _homoglyph_seen.add(span_start)
+                findings.append(
+                    _finding(
+                        "unicode_homoglyph",
+                        WARNING,
+                        "Mixed-script text (a Cyrillic/Greek look-alike inside ASCII) in a command or URL — "  # noqa: E501
+                        "can disguise a different command or destination.",
+                        evidence=span_text[:60],
+                        line=_line_of(text, span_start),
+                    )
                 )
-                + ".",
-                evidence=m.group(0),
-                line=_line_of(body, m.start()),
-            )
-        )
 
-    # Anti-refusal / jailbreak instructions. Downgrade ONLY on the security-category
-    # signal — the generic doc-marker window can't be used here because the trigger
-    # words themselves ("never", "do not", "without") ARE doc markers, so a real
-    # jailbreak would always self-downgrade.
-    _anti_doc = (category or "").strip().lower() in _SECURITY_CATEGORIES
-    for m in _ANTI_REFUSAL.finditer(body):
-        findings.append(
-            _finding(
-                "anti_refusal",
-                INFO if _anti_doc else WARNING,
-                "Instructs the agent to drop its refusals / safety guidelines"
-                + (" — documented, informational" if _anti_doc else " — reads as a jailbreak")
-                + ".",
-                evidence=m.group(0),
-                line=_line_of(body, m.start()),
-            )
-        )
+        if field:
+            # Metadata findings have no body line — a line number here would point at
+            # unrelated body text. Attribute them to the field instead.
+            for f in findings[_first:]:
+                f.pop("line", None)
+                f["field"] = field
+                f["message"] = f"{f['message']} (in the skill's {field}, not the body)"
 
-    # Production-destructive commands (rm -rf /, dd to a device, unscoped DROP, …).
-    #
-    # Base severity is WARNING with a doc-downgrade, deliberately NOT
-    # CRITICAL-unless-downgraded. The difference is who holds the last lever:
-    # CRITICAL blocks, so the doc-downgrade would be the only thing standing between a
-    # match and a block — and that downgrade consults `category`, a free-form field the
-    # AUTHOR sets on their own content. At WARNING base the lever is gone rather than
-    # narrowed: warning → FLAGGED, never BLOCKED, so no value of `category` can decide
-    # whether the skill publishes. The category downgrade still softens WARNING → INFO
-    # on genuine documentation.
-    #
-    # WARNING also matches how the check actually fires. Measured across every readable
-    # public skill in a multi-thousand-skill corpus, the handful of matches that leaned
-    # on the category lever were all defenders, not attackers: a quoted `rm -rf /` in a
-    # Perl injection warning, a Kali `dd` writing an install image, two forensics
-    # denylists. Flagging those is right; blocking them is not.
-    _behavioral(
-        _DESTRUCTIVE,
-        "destructive_commands",
-        "Destructive command",
-        base=WARNING,
-        downgraded=INFO,
-        instruction_suffix=" — destructive if run against a production target; review the context.",
-    )
-
-    # Mixed-script homoglyph inside a command/URL token — check URLs + fenced code.
-    _homoglyph_seen: set[int] = set()
-    for span_start, span_text in _homoglyph_candidates(body, code_spans):
-        if span_start in _homoglyph_seen:
-            continue
-        if _CYR_GREEK.search(span_text) and _ASCII_LETTER.search(span_text):
-            _homoglyph_seen.add(span_start)
-            findings.append(
-                _finding(
-                    "unicode_homoglyph",
-                    WARNING,
-                    "Mixed-script text (a Cyrillic/Greek look-alike inside ASCII) in a command or URL — "  # noqa: E501
-                    "can disguise a different command or destination.",
-                    evidence=span_text[:60],
-                    line=_line_of(body, span_start),
-                )
-            )
+    _sweep(body)
+    if meta:
+        _sweep(meta, field="name/description")
 
     # Tool over-reach — wildcard / over-broad allowed-tools grant.
     for finding in _check_tool_overreach(allowed_tools):

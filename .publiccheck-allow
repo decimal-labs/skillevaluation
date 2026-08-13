@@ -1,0 +1,15 @@
+# Suppressions for the pre-commit publication check.
+#
+# Each non-comment line is an extended regex matched against
+# "<rule-id> <path>:<line>:<text>". Keep every entry as narrow as the thing it
+# excuses — a broad pattern here is how a real leak gets waved through, so scope
+# to the rule AND the exact literal, never to a whole file or directory.
+#
+# AKIAIOSFODNN7EXAMPLE is Amazon's own documentation placeholder. It appears
+# verbatim throughout the public AWS docs and has never been a live credential.
+# This repo is the safety scanner, so it needs a realistic key to reason about:
+# tests/test_safety_scan.py asserts the scanner rates this value INFO rather than
+# blocking it (a marker inside the value itself is decisive evidence of a
+# placeholder), and the comments in safety.py explain that rule. Any OTHER
+# AKIA-shaped string stays blocked — this entry pins the one literal.
+^1a-live-secret .*AKIAIOSFODNN7EXAMPLE
