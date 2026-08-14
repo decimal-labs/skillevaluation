@@ -1,8 +1,12 @@
 # skillevaluation
 
+*Part of [DecimalAI](https://decimal.ai). Most users want the Python SDK → [decimal-labs/decimalai-python](https://github.com/decimal-labs/decimalai-python).*
+
 **Does your skill actually make the agent better? Prove it — with measured before/after numbers.**
 
 [![PyPI](https://img.shields.io/pypi/v/skillevaluation)](https://pypi.org/project/skillevaluation/)
+[![Downloads](https://static.pepy.tech/badge/skillevaluation/month)](https://pepy.tech/project/skillevaluation)
+[![CI](https://img.shields.io/github/actions/workflow/status/decimal-labs/skillevaluation/ci.yml?branch=main)](https://github.com/decimal-labs/skillevaluation/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/skillevaluation/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://pypi.org/project/skillevaluation/)
 
@@ -152,6 +156,8 @@ A typed Python reference implementation. The core is dependency-light (only need
 
 Deliberately **out of scope:** live traffic-split experiments, external eval-score webhooks (DeepEval/LangSmith), catalog ranking or publish-gate policy, and the exact LLM-judge prompt wording (the contract is specified; the prompt is your choice).
 
+Also out of scope — but covered by the sibling spec: [`agentversion`](https://github.com/decimal-labs/agentversion) versions the agent runtime itself (a manifest of tools/prompts/models, diffed across versions), while `skillevaluation` A/B-benchmarks a single skill; an agent manifest can carry `skillevaluation` results in its `evaluation.gates[]`.
+
 ---
 
 ## Contributing
@@ -166,3 +172,7 @@ pytest
 ## License
 
 [Apache 2.0](https://github.com/decimal-labs/skillevaluation/blob/main/LICENSE).
+
+---
+
+[Docs](https://docs.decimal.ai) · [Registry](https://app.decimal.ai/skills) · [SDK](https://github.com/decimal-labs/decimalai-python) · [agentversion](https://github.com/decimal-labs/agentversion) · [regression-check](https://github.com/decimal-labs/regression-check)
