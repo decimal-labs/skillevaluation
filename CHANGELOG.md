@@ -2,7 +2,7 @@
 
 All notable changes to `skillevaluation` are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [0.7.1] — 2026-08-14
 
 Safety scanner — two detection gaps closed (`SCANNER_VERSION` 4 → 5). Behavior change:
 some content that scanned `clean` before now scans `flagged` or `blocked`.

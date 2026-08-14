@@ -24,4 +24,4 @@ Or from a shell::
 See https://github.com/decimal-labs/skillevaluation for the spec.
 """
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
