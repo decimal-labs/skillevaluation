@@ -60,5 +60,5 @@ uvx twine upload dist/*        # PERMANENT — cannot be undone
 ## Notes & gotchas
 
 - **Public repo, public package.** Both the GitHub repo and the PyPI package are public, so every README badge, every `https://github.com/decimal-labs/skillevaluation/...` link and every cross-link to `agentversion` is expected to resolve. A 404 is a real breakage to chase.
-- **Development Status** classifier in `pyproject.toml` is `3 - Alpha`. Bump it as the package matures.
+- **Development Status** classifier in `pyproject.toml` is `4 - Beta`, matching `agentversion` and `decimalai`. It moves to `5 - Production/Stable` when the spec cuts v1.0 (see `spec/versioning-policy.md`), not before.
 - **PyPI cache lag.** The top-level `https://pypi.org/pypi/skillevaluation/json` can stay cached on the previous version for a minute or two after upload; the version-specific `.../<version>/json` endpoint reflects new releases almost immediately.
