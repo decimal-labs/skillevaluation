@@ -28,7 +28,7 @@ Here's the bundled [`commit-conventions`](https://github.com/decimal-labs/skille
 
 The skill takes the agent from failing the convention to nailing it. That's exactly the kind of claim `skillevaluation` is built to produce — a measured before/after, not a vibe.
 
-> Numbers above are illustrative of the example's shape. Don't take our word for it — that's the whole point: run `skillevaluation run ./examples/commit-conventions` and get your own. (Turn / tool-call deltas need an agent-runtime adapter — see the honest-metrics note below.)
+> Numbers above are illustrative of the example's shape. Don't take our word for it — that's the whole point: clone the repo and run `skillevaluation run ./examples/commit-conventions` to get your own. (The examples also ship inside the wheel, but the paths below are relative to a checkout.) (Turn / tool-call deltas need an agent-runtime adapter — see the honest-metrics note below.)
 
 ---
 
@@ -69,11 +69,13 @@ cases:
         label: "bracketed ticket + NET: area code"
 ```
 
-See the full five-case suite in [`examples/commit-conventions/eval.yaml`](https://github.com/decimal-labs/skillevaluation/blob/main/examples/commit-conventions/eval.yaml) (ships in the wheel — `skillevaluation run ./examples/commit-conventions`).
+See the full five-case suite in [`examples/commit-conventions/eval.yaml`](https://github.com/decimal-labs/skillevaluation/blob/main/examples/commit-conventions/eval.yaml) (ships inside the wheel too, though the relative path below assumes a checkout — `git clone https://github.com/decimal-labs/skillevaluation && cd skillevaluation`).
 
-**2. Run the A/B benchmark.** First a free, networkless dry-run (no API key, ~10s) to confirm the harness runs end-to-end:
+**2. Run the A/B benchmark.** The bundled examples are referenced by relative path, so start from a
+checkout. First a free, networkless dry-run (no API key, ~10s) to confirm the harness runs end-to-end:
 
 ```bash
+git clone https://github.com/decimal-labs/skillevaluation && cd skillevaluation
 skillevaluation run ./examples/commit-conventions --adapter mock
 ```
 

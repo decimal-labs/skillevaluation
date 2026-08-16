@@ -48,7 +48,7 @@ Specifically, between v1.0 and v2.0:
 
 ## Trajectory format versioning
 
-The trajectory format has an explicit `FORMAT_VERSION` because different format versions can coexist in storage. A `SkillRaterReport` row written with `FORMAT_VERSION = "v1"` is distinguishable from one written with `"v2"`.
+The trajectory format has an explicit `FORMAT_VERSION` because different format versions can coexist in storage. A stored trajectory row written with `FORMAT_VERSION = "v1"` is distinguishable from one written with `"v2"`.
 
 When v2 ships:
 
