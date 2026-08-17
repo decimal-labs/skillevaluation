@@ -21,3 +21,12 @@
 # Pinned to the one file and the one rule; any OTHER file in this repo
 # carrying a PEM header still fails.
 ^1a-live-secret skillevaluation/safety\.py:.*BEGIN RSA PRIVATE KEY
+
+# tests/test_runner_validators.py and tests/test_runner_workspace.py build a fake
+# DATABASE_URL to prove the runner SCRUBS it out of the child process env — the
+# assertion is that this string never reaches captured output. The password is the
+# literal `CANARY-DBPASS`, sitting beside `sk-leak-CANARY-1234567890`; both exist to
+# be searched for. A test that a secret gets scrubbed needs a secret-shaped value.
+# Pinned to the exact literal, so any OTHER credential-in-a-URL in this repo — the
+# real risk, a prod Cloud SQL string pasted into a runbook — still blocks.
+^1d-uri-credential .*postgresql://decimal:CANARY-DBPASS@host:5432/prod
