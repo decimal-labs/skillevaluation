@@ -227,3 +227,34 @@ def test_spawn_failure_fails_validator_not_suite():
     assert results[0]["errored"] is True
     assert results[1]["passed"] is True
     assert results[1]["errored"] is False
+
+
+def test_untyped_expect_exit_code_does_not_escape_the_runner():
+    """A validator that never went through the parser must not crash run_validators.
+
+    The parser rejects a non-integer `expect_exit_code`, but the Lane-F ingest writes
+    validator dicts to the DB without checking it, and those reach the runner directly.
+    That `int()` sits outside the per-validator try, so an untyped value used to escape
+    `run_validators` uncaught. Coercible values still coerce; only the ones `int()`
+    refuses fall back to 0. This is the same derivation the sandbox entrypoint uses —
+    the two must agree or dev and prod classify the same run differently.
+    """
+    ws = prepare_workspace([])
+    # (stored value, expected expect_exit_code) — coercion is int()'s, not ours.
+    expected = [
+        ("0", 0),        # the silent-coercion case the parser now rejects up front
+        (3.7, 3),        # float truncates, as int() does
+        (True, 1),       # bool is an int subclass
+        ("abc", 0),      # ValueError -> fallback
+        (None, 0),       # TypeError  -> fallback
+        (["0"], 0),      # TypeError  -> fallback
+        ({"a": 1}, 0),   # TypeError  -> fallback
+    ]
+    for bad, want in expected:
+        results = run_validators(
+            [{"cmd": "true", "expect_exit_code": bad, "label": "untyped"}],
+            ws,
+            response_text="x",
+        )
+        assert len(results) == 1, bad
+        assert results[0]["expect_exit_code"] == want, (bad, results[0])

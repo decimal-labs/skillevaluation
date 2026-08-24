@@ -2,6 +2,33 @@
 
 All notable changes to `skillevaluation` are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## Unreleased
+
+Parser — `expect_exit_code` is now type-checked. **Behavior change:** a validator whose
+`expect_exit_code` is not an integer is rejected at parse time instead of being silently
+coerced or crashing.
+
+- **A non-integer `expect_exit_code` now raises `EvalYamlParseError` naming the case and
+  validator index.** Previously the value went straight into `int()`: `"3"` and `3.0`
+  coerced silently, `true` became `1`, and `null`, `abc`, a list or a mapping escaped as a
+  bare `TypeError`/`ValueError` with no case name attached. Callers that catch only
+  `EvalYamlParseError` — which is all of them — turned that into a 500 or an uncaught
+  worker exception. Booleans are rejected too: `bool` subclasses `int` in Python, and
+  `schemas/eval-yaml.schema.json` has always declared `{"type": "integer"}`, which excludes
+  them. This makes the reference parser match the schema it publishes and that
+  `CONFORMANCE.md` requires every implementation to validate against. Thanks to
+  @NewPixel1987 for the fix (#7, closing #4).
+- **A `compatibility-tests/parser/` fixture makes the rule normative.** The suite is what
+  alternate-language implementations are graded against, so a rule that lived only in
+  `tests/test_parser.py` bound Python and nobody else. The fixture uses a quoted `"0"` —
+  the silent-coercion case, not an obviously broken one.
+- **`run_validators` no longer escapes on an untyped `expect_exit_code`.** The parser guard
+  does not cover every path: the Lane-F ingest writes validator dicts to the database
+  without checking this field, and those reach the runner directly. That `int()` sits
+  outside the per-validator `try`, so an untyped value propagated out of `run_validators`
+  uncaught. It now falls back to `0` — the derivation the sandbox entrypoint already used,
+  which the two must share or dev and prod classify the same run differently.
+
 ## [0.7.1] — 2026-08-14
 
 Safety scanner — two detection gaps closed (`SCANNER_VERSION` 4 → 5). Behavior change:

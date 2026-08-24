@@ -187,7 +187,17 @@ def run_validators(
 
     for v in validators:
         cmd = v.get("cmd") or ""
-        expect_exit = int(v.get("expect_exit_code", 0))
+        # The parser guarantees an int (it rejects any other type), but validators also
+        # reach here straight from the DB — the Lane-F ingest at fleet_import_measure
+        # admits any dict without checking this field, bypassing the parser entirely.
+        # Fall back to 0 rather than raising: this int() sits outside the try below, so
+        # an untyped value would otherwise escape run_validators uncaught. The sandbox
+        # entrypoint already derives it exactly this way, and the two must agree or dev
+        # and prod classify the same run differently.
+        try:
+            expect_exit = int(v.get("expect_exit_code", 0))
+        except (TypeError, ValueError):
+            expect_exit = 0
         label = v.get("label") or cmd[:80]
         try:
             _args, _use_shell = _build_invocation(cmd)
