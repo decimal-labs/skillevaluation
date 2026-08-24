@@ -271,9 +271,15 @@ def parse_eval_yaml(text: str) -> list[ParsedTestCase]:
                 raise EvalYamlParseError(
                     f"eval.yaml: case '{name}' — validator #{v_idx}.cmd must be a non-empty string"
                 )
+            expect_exit_code = v.get("expect_exit_code", 0)
+            if not isinstance(expect_exit_code, int) or isinstance(expect_exit_code, bool):
+                raise EvalYamlParseError(
+                    f"eval.yaml: case '{name}' — validator #{v_idx}.expect_exit_code "
+                    "must be an integer if present"
+                )
             script_validators.append({
                 "cmd": cmd,
-                "expect_exit_code": int(v.get("expect_exit_code", 0)),
+                "expect_exit_code": expect_exit_code,
                 "label": v.get("label") or cmd[:80],
             })
 

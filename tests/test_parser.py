@@ -78,6 +78,24 @@ cases:
         )
 
 
+@pytest.mark.parametrize("invalid_value", ['"3"', "true", "3.0"])
+def test_parser_rejects_non_integer_expect_exit_code(invalid_value):
+    with pytest.raises(
+        EvalYamlParseError,
+        match=r"case 'a'.*validator #0.*expect_exit_code.*integer",
+    ):
+        parse_eval_yaml(
+            f"""
+cases:
+  - name: a
+    prompt: 'foo'
+    validators:
+      - cmd: "true"
+        expect_exit_code: {invalid_value}
+"""
+        )
+
+
 def test_parser_rejects_unknown_top_level_key():
     """A sibling key next to a valid `cases:` is a typo, not silently dropped."""
     with pytest.raises(EvalYamlParseError, match="unknown top-level key"):
