@@ -51,6 +51,31 @@ jobs:
       - name: Pytest (unit + conformance suite)
         run: pytest
 
+  windows:
+    # ADVISORY, and deliberately so. PR #7's review reported 23 failures on Windows and
+    # this repo's CI has only ever run ubuntu — so the package's Windows behaviour was
+    # unknown rather than good, and a reader on Windows found out by running it. This job
+    # makes the state visible without pretending the platform is supported: it does not
+    # block a merge (`continue-on-error`), and README's supported-platforms line says the
+    # same thing in words.
+    #
+    # Turn this into a blocking job the day Windows is supported. Deleting it instead
+    # would put the repo back to not knowing.
+    name: Tests on Windows (advisory)
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - name: Pytest (advisory — failures here do not block)
+        run: pytest
+
   floors:
     # The version floors in pyproject.toml are claims; this job is what makes them
     # true. It installs the LOWEST version of every direct dependency and runs the

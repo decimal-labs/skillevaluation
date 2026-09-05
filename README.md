@@ -48,6 +48,13 @@ The skill takes the agent from failing the convention to nailing it. That's exac
 
 ## Quickstart
 
+**Supported platforms: Linux and macOS, Python 3.10–3.13.** Windows is not supported
+today — a review of PR #7 reported 23 test failures there, and CI ran ubuntu only, so
+the behaviour was unknown rather than good. Since 2026-09-05 CI carries an advisory
+Windows job so the state is visible; it does not block a merge. If you need Windows,
+say so on an issue and it can become a blocking job.
+
+
 ```bash
 pip install "skillevaluation[runner]"
 ```
