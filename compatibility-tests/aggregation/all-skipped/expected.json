@@ -4,21 +4,9 @@
     "without_skill": null,
     "delta_pts": null
   },
-  "duration_ms": {
-    "with_skill_avg": 0.0,
-    "without_skill_avg": 0.0,
-    "delta_pct": null
-  },
-  "turns": {
-    "with_skill_avg": 0.0,
-    "without_skill_avg": 0.0,
-    "delta_pct": null
-  },
-  "tokens": {
-    "with_skill_avg": 0.0,
-    "without_skill_avg": 0.0,
-    "delta_pct": null
-  },
+  "duration_ms": null,
+  "turns": null,
+  "tokens": null,
   "tool_calls": {
     "with_skill_avg": 0.0,
     "without_skill_avg": 0.0,

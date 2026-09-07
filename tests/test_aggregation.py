@@ -209,6 +209,81 @@ def test_error_floor_not_tripped_at_exactly_25_percent():
     assert agg.pass_rate["delta_pts"] == 100.0
 
 
+def test_degenerate_run_reports_no_efficiency_averages():
+    """A run where nothing aggregated measured NOTHING — duration/turns/tokens must be null.
+
+    They used to be `with_skill_avg: 0.0, without_skill_avg: 0.0` (totals of 0 over the
+    `max(aggregated_n, 1)` divisor guard), which the Benchmark tab renders as measured values
+    "0.0"/"0" beside a "—" delta: a published number for a computation that never happened, on the
+    same aggregate whose pass_rate honestly says null.
+    """
+    results = [CaseResult(case_name=f"err{i}", outcome=Outcome.ERROR) for i in range(3)]
+    agg = compute_run_aggregates(results)
+    assert agg.cases_aggregated == 0
+    assert agg.duration_ms is None
+    assert agg.turns is None
+    assert agg.tokens is None
+    # ...on the wire too — this is the shape the report actually reads.
+    d = agg.to_dict()
+    assert d["duration_ms"] is None
+    assert d["turns"] is None
+    assert d["tokens"] is None
+    # The disclosure counts and the equally-null pass rate still say what happened.
+    assert d["pass_rate"] == {"with_skill": None, "without_skill": None, "delta_pts": None}
+    assert d["errors"] == 3
+    assert d["total_cases"] == 3
+
+
+def test_degenerate_run_by_apples_to_oranges_also_reports_no_averages():
+    """Same N/A contract when the run emptied out via the apples-to-oranges skip, not errors —
+    the trigger is `cases_aggregated == 0`, not the error count."""
+    agg = compute_run_aggregates([
+        CaseResult(
+            case_name="not_attempted",
+            outcome=Outcome.FAIL_KEPT,
+            with_skill=CaseMetrics(passed=False, turns=3, total_tokens=900),
+            without_skill=CaseMetrics(passed=False, turns=1, total_tokens=20,
+                                      task_attempted=False),
+        ),
+    ])
+    assert agg.cases_aggregated == 0
+    assert agg.errors == 0
+    assert (agg.duration_ms, agg.turns, agg.tokens) == (None, None, None)
+    assert agg.cases_skipped_apples_oranges == 1
+
+
+def test_measured_run_still_reports_its_real_averages():
+    """The other half of the guard: a run that DID measure must still publish its averages —
+    including a run that carries errors alongside comparable cases. Nulling more widely than
+    `cases_aggregated == 0` would delete real measurements."""
+    results = [
+        CaseResult(case_name="err", outcome=Outcome.ERROR),
+        CaseResult(
+            case_name="a",
+            outcome=Outcome.FLIP_TO_PASS,
+            with_skill=CaseMetrics(passed=True, duration_ms=1000, turns=2, total_tokens=100),
+            without_skill=CaseMetrics(passed=False, duration_ms=3000, turns=6, total_tokens=400),
+        ),
+        CaseResult(
+            case_name="b",
+            outcome=Outcome.PASS_KEPT,
+            with_skill=CaseMetrics(passed=True, duration_ms=2000, turns=4, total_tokens=200),
+            without_skill=CaseMetrics(passed=True, duration_ms=1000, turns=2, total_tokens=200),
+        ),
+    ]
+    agg = compute_run_aggregates(results)
+    assert agg.cases_aggregated == 2
+    assert agg.turns.with_skill_avg == 3.0 and agg.turns.without_skill_avg == 4.0
+    assert agg.turns.delta_pct == -25.0
+    assert agg.tokens.with_skill_avg == 150.0 and agg.tokens.without_skill_avg == 300.0
+    assert agg.duration_ms.with_skill_avg == 1500.0
+    assert agg.duration_ms.without_skill_avg == 2000.0
+    d = agg.to_dict()
+    assert d["turns"]["with_skill_avg"] == 3.0
+    assert d["tokens"]["without_skill_avg"] == 300.0
+    assert d["duration_ms"]["delta_pct"] == -25.0
+
+
 def test_error_floor_false_on_empty_and_error_free_runs():
     """Zero cases (the degenerate-run rule already covers it) and error-free runs are not
     error-dominated."""

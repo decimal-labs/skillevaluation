@@ -89,6 +89,9 @@ class RunAggregate:
     """Aggregated run-level metrics."""
 
     pass_rate: dict[str, float | None] = field(default_factory=dict)
+    # None (→ `null` on the wire) when the run measured no comparable case at all
+    # (``cases_aggregated == 0``): there is no average to report, so none is emitted. See the
+    # degenerate-run block in compute_run_aggregates.
     duration_ms: DeltaResult | None = None
     turns: DeltaResult | None = None
     tokens: DeltaResult | None = None
@@ -274,9 +277,24 @@ def compute_run_aggregates(case_results: list[CaseResult]) -> RunAggregate:
         pass_rate["delta_pts"] = None
 
     # Raw (un-gated) deltas over all attempted cases — kept for backward compatibility.
-    duration_d = delta_pct(totals["with_duration"] / n, totals["without_duration"] / n)
-    turns_d = delta_pct(totals["with_turns"] / n, totals["without_turns"] / n)
-    tokens_d = delta_pct(totals["with_tokens"] / n, totals["without_tokens"] / n)
+    if aggregated_n == 0:
+        # Degenerate run, same trigger as the null pass_rate above: every case errored or was
+        # apples-to-oranges skipped, so nothing was measured. The divisor guard `max(aggregated_n,
+        # 1)` used to divide totals of 0 by 1 and emit `with_skill_avg: 0.0, without_skill_avg:
+        # 0.0` — averages of an empty set. The Benchmark tab renders those as measured values
+        # ("0.0" turns, "0" tokens) beside a "—" delta, which reads as "we ran this and the skill
+        # changed nothing" for a run that never executed a comparable case, and contradicted the
+        # null pass_rate on the very same aggregate. Emit the dimension as null instead (consumers
+        # already treat a missing delta as N/A: cli.py `_fmt_delta_row` drops the row, the web
+        # report falls through to "—"). Undo this and an unrun benchmark publishes a number
+        # nothing computed.
+        duration_d = turns_d = tokens_d = None
+    else:
+        duration_d = delta_pct(totals["with_duration"] / n, totals["without_duration"] / n)
+        turns_d = delta_pct(totals["with_turns"] / n, totals["without_turns"] / n)
+        tokens_d = delta_pct(totals["with_tokens"] / n, totals["without_tokens"] / n)
+    # tool_calls and the four *_correctness_gated dimensions still report 0.0/0.0 on a degenerate
+    # run — the same fabrication, deliberately left for a separate change rather than widened here.
     tool_calls_d = delta_pct(totals["with_tool_calls"] / n, totals["without_tool_calls"] / n)
 
     # Correctness-gated deltas over both-correct cases only (what the leaderboards rank on). With no
