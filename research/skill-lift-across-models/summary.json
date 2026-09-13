@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-09-13T02:12:37+00:00",
+  "source": "recompute.py over skill_lift_pairs.csv + skill_lift_cases.csv",
+  "models": [
+    "gemini-3.5-flash",
+    "gemini-3.6-flash"
+  ],
+  "headline_floor_cases": 8,
+  "pairs_shipped": 48,
+  "pairs_in_population": 45,
+  "pairs_below_floor": [
+    {
+      "skill": "currency-minor-units-from-reference",
+      "headline_cases": {
+        "gemini-3.5-flash": 2,
+        "gemini-3.6-flash": 22
+      }
+    },
+    {
+      "skill": "progressive-tax-bracket-math",
+      "headline_cases": {
+        "gemini-3.5-flash": 1,
+        "gemini-3.6-flash": 22
+      }
+    },
+    {
+      "skill": "sql-analytics-conventions-mt",
+      "headline_cases": {
+        "gemini-3.5-flash": 3,
+        "gemini-3.6-flash": 22
+      }
+    }
+  ],
+  "fell": 34,
+  "rose": 11,
+  "held": 0,
+  "mean_change_pts": -17.2,
+  "median_change_pts": -18.2,
+  "largest_drop": [
+    "markdown-semantic-wrap",
+    -61.05
+  ],
+  "largest_rise": [
+    "a-set-of-resources-formatter",
+    41.81999999999999
+  ],
+  "same_case_set_pairs": [
+    "postgresql-conventions",
+    "setup-husky-pre-commit",
+    "svg-ui-panel-conventions",
+    "thesis-dissertation-compliance"
+  ],
+  "same_case_set_values": {
+    "postgresql-conventions": {
+      "gemini-3.5-flash": 50.0,
+      "gemini-3.6-flash": 12.5,
+      "cases": 24
+    },
+    "setup-husky-pre-commit": {
+      "gemini-3.5-flash": 65.22,
+      "gemini-3.6-flash": 34.78,
+      "cases": 23
+    },
+    "svg-ui-panel-conventions": {
+      "gemini-3.5-flash": 91.3,
+      "gemini-3.6-flash": 73.91,
+      "cases": 23
+    },
+    "thesis-dissertation-compliance": {
+      "gemini-3.5-flash": 50.0,
+      "gemini-3.6-flash": 41.67,
+      "cases": 24
+    }
+  },
+  "pairs_whose_case_sets_differ": 41,
+  "rows_where_derived_lift_differs_from_published": 1,
+  "derived_disagreements": [
+    {
+      "skill": "progressive-tax-bracket-math",
+      "model": "gemini-3.6-flash",
+      "published_pts": 80.0,
+      "derived_pts": 81.8
+    }
+  ],
+  "case_rows_read": 2038
+}
