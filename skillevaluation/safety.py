@@ -55,7 +55,12 @@ from typing import Any
 #                  behavioural / unicode / URL / injection sweep runs over `name` +
 #                  `description` as well as the body, so a payload in a skill's metadata
 #                  is seen; metadata findings carry `field` instead of `line`.
-SCANNER_VERSION = "5"
+# v6 (2026-10-12): `unicode_homoglyph` flags a WORD that mixes scripts (`аpt`, `pаypal`)
+#                  instead of any URL or code span holding a Greek/Cyrillic character
+#                  anywhere. The old rule badged math notation — Σ and σ next to ASCII in a
+#                  PERT estimate template made a pack starter read "caution". A look-alike
+#                  swap is a letter inside an otherwise-ASCII token, which is what it checks.
+SCANNER_VERSION = "6"
 
 # Severity ladder. The caller maps status → action (block / warn / show).
 CRITICAL = "critical"
@@ -371,6 +376,20 @@ _DESTRUCTIVE: list[tuple[str, re.Pattern[str]]] = [
 # handled separately above; this catches confusable-letter swaps.
 _CYR_GREEK = re.compile(r"[Ѐ-ӿͰ-Ͽ]")
 _ASCII_LETTER = re.compile(r"[A-Za-z]")
+# A run of letters in any script — `[^\W\d_]` is "word character that is not a digit or
+# underscore", so `аpt` (Cyrillic а + ASCII pt) is ONE run while `σ=(P-O)/6` is three.
+_LETTER_RUN = re.compile(r"[^\W\d_]+")
+
+
+def _mixed_script_word(text: str):
+    """The first word that mixes a Cyrillic/Greek letter with ASCII letters — the actual
+    shape of a look-alike swap — or None. Standalone Greek (σ, Σ, μ) is notation, not a
+    disguise."""
+    for m in _LETTER_RUN.finditer(text or ""):
+        w = m.group(0)
+        if _CYR_GREEK.search(w) and _ASCII_LETTER.search(w):
+            return w
+    return None
 
 # Trigger phrases engineered to win routing on everything (activation-maximizing).
 # INFO only — a hygiene nudge, never a block.
@@ -991,7 +1010,7 @@ def scan_skill_content(
         for span_start, span_text in _homoglyph_candidates(text, code_spans):
             if span_start in _homoglyph_seen:
                 continue
-            if _CYR_GREEK.search(span_text) and _ASCII_LETTER.search(span_text):
+            if _mixed_script_word(span_text):
                 _homoglyph_seen.add(span_start)
                 findings.append(
                     _finding(

@@ -151,3 +151,25 @@ def test_cli_scan_json_and_sarif(tmp_path, capsys):
     main(["scan", str(tmp_path / "bad"), "--format", "sarif"])
     sarif = json.loads(capsys.readouterr().out)
     assert sarif["version"] == "2.1.0" and sarif["runs"]
+
+
+# ── unicode_homoglyph: a mixed-script WORD, not math notation (v6) ─────
+
+def _homoglyph(body):
+    r = safety.scan_skill_content(body, name="x", category="documentation")
+    return [f for f in r["findings"] if f["check"] == "unicode_homoglyph"]
+
+
+def test_greek_math_notation_in_a_template_is_not_a_homoglyph():
+    body = "## Estimate\n\n```\nE = (O + 4M + P) / 6\nσ = (P - O) / 6\nΣ task estimates ± 2σ\n```\n"
+    assert _homoglyph(body) == []
+
+
+def test_a_cyrillic_letter_inside_a_command_word_is_still_flagged():
+    body = "## Setup\n\n```bash\nsudo аpt install curl\n```\n"
+    assert len(_homoglyph(body)) == 1
+
+
+def test_a_cyrillic_letter_inside_a_url_host_is_still_flagged():
+    body = "Download from https://pаypal.com/install.sh before you start.\n"
+    assert len(_homoglyph(body)) == 1
