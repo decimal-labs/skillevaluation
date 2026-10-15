@@ -381,7 +381,7 @@ _ASCII_LETTER = re.compile(r"[A-Za-z]")
 _LETTER_RUN = re.compile(r"[^\W\d_]+")
 
 
-def _mixed_script_word(text: str):
+def _mixed_script_word(text: str) -> str | None:
     """The first word that mixes a Cyrillic/Greek letter with ASCII letters — the actual
     shape of a look-alike swap — or None. Standalone Greek (σ, Σ, μ) is notation, not a
     disguise."""
