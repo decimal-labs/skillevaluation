@@ -431,6 +431,7 @@ def _format_scan_text(per: list[tuple[str, str, dict[str, Any]]]) -> str:
 
 def cmd_scan(args: argparse.Namespace) -> int:
     from skillevaluation import safety
+    from skillevaluation.skillfmt import taxonomy
 
     from .skill_dir import split_frontmatter
 
@@ -448,7 +449,9 @@ def cmd_scan(args: argparse.Namespace) -> int:
             body,
             name=name,
             description=str(fm.get("description") or ""),
-            category=fm.get("category"),
+            # metadata.decimalai-category first (format 1), then a legacy top-level key;
+            # a non-string value counts as no category rather than crashing the scan.
+            category=taxonomy(fm)["category"],
             allowed_tools=fm.get("allowed-tools") or fm.get("allowed_tools"),
             trigger_phrases=fm.get("trigger_phrases") or fm.get("triggers"),
         )

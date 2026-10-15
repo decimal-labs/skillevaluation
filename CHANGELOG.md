@@ -2,7 +2,97 @@
 
 All notable changes to `skillevaluation` are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## Unreleased
+## [0.8.0] — 2026-10-15
+
+A new module, `skillevaluation.skillfmt`, defines the on-disk skill format: install names,
+the exact bytes of `SKILL.md` ("format 1"), the validator and the hashes. A server that
+renders a skill folder and a client that checks it now call the same pure code, needing only
+PyYAML. Golden vectors make the format replayable from any language. Three behavior changes
+ship in this release: `skillevaluation scan` reads the category from `metadata`, the safety
+scanner's homoglyph rule (scanner version 6), and null averages for a run that measured
+nothing. The `expect_exit_code` parser fix is described below them.
+
+- **`skillfmt` install names.** `install_name_for(name, skill_id)` maps a registry name such
+  as `acme/refund-policy` to a folder name such as `acme-refund-policy`: lowercase
+  `[a-z0-9-]`, at most 64 characters, with diacritics folded (`Ünïcödé` → `unicode`). Some
+  bases get the hashed form `<stem>-<6 hex of sha256(skill_id)>` instead:
+  - empty, or over 64 characters;
+  - reserved: `install`, `search`, `check`, `decimalai-skills`;
+  - **lossy**: non-Latin characters were dropped (`pdf 中文 tools` → `pdf-tools-…`);
+  - **namespace-only**: `owner/<title>` with nothing Latin after the slash
+    (`example-owner/中文标题` → `example-owner-…`), so hundreds of skills from one owner
+    cannot share one folder;
+  - a plain YAML scalar that would not read back as itself (`404`, `yes`, `2020-01-01`):
+    written as `name: 404`, a loader gets an integer and refuses the skill.
+
+  `choose_install_name(name, skill_id, taken)` keeps an installed skill's folder forever and
+  moves to the hashed form on a collision within one project. Names collide
+  case-insensitively (`Acme-Refund-Policy/` takes `acme-refund-policy`), because macOS and
+  Windows checkouts are case-insensitive.
+- **`skillfmt` rendering, format 1.**
+  - **Bytes.** `render_skill_md` and `render_bundle` write frontmatter keys in a fixed order:
+    `name`, `description`, `license`, `compatibility`, `allowed-tools`,
+    `disable-model-invocation`, `metadata`. `metadata` is a flat map of quoted strings
+    (`decimalai-skill-id`, `-version-id`, `-version`, `-body-sha256`, `-name`, `-format`,
+    `-invocation`, then the optional `-category`, `-skill-scope`, `-skill-type` and
+    `-source`). The body is written stripped, with exactly one trailing newline.
+  - **Line endings.** The body is written with LF line endings: CRLF, then any lone CR,
+    becomes LF, so a Windows-authored body renders instead of failing the LF-only check.
+    `body_sha256` hashes the body the same way, so the stored body, the written file and
+    a CRLF checkout of it give one value. A body with no CR hashes as `sha256(body.strip())`.
+  - **Self-check.** Each rendering is parsed back and validated before it is returned, so a
+    renderer bug raises `RenderError` and never produces a bad file.
+  - **Long values.** A description is collapsed to one line and clipped at 1024 characters on
+    a word boundary. Compatibility is clipped at 500. Every clip is reported in
+    `policy_notes`.
+  - **Attachments.** Files sit under `scripts/`, `references/`, `templates/` or `assets/`.
+    Executable files get mode 0755. Paths that are unsafe (absolute, `..`, a backslash,
+    outside those four folders), duplicated (including case-only duplicates) or that put a
+    file where a directory must go are refused, whatever the file is called. Of the safe
+    paths, a binary attachment is listed as `unavailable`, and so is any path through a
+    file or folder named `SKILL.md` at any depth, which loaders would read as a second skill.
+- **`yaml_quote`.** Every quoted value reads back exactly and stays on one line:
+  - control characters (C0 and C1), DEL, U+2028, U+2029, U+FEFF and the noncharacters
+    PyYAML refuses become `\uXXXX`;
+  - every third `-` in a run of hyphens is written `\u002d`, so `---` never appears inside a
+    frontmatter. ADK splits the whole file on its first `---`.
+- **`allowed_tools_for`.** Skills your organization did not author keep only `Read`, `Grep`
+  and `Glob`, because Claude pre-approves every listed tool. A wildcard scope on one of them
+  (`Read(*)`, `Grep(**)`) is written as the bare tool; any other scope is dropped. Authored
+  skills keep their list, except that a bare `Bash` (also `Bash(*)` and `Bash(*:*)`)
+  becomes one scoped entry per bundled script, for example
+  `Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/x.py *)`.
+  `tokenize_allowed_tools` repairs lists damaged by importers. For example, `["Read,", "Grep,"]`
+  gives `Read` and `Grep`, and `["Bash(git", "log", "*)"]` gives `Bash(git log *)`; without
+  the repair, such skills lost every tool.
+- **`validate_skill_md`.** Returns `Problem(rule, scope, message)` with rule ids F1–F15:
+  - `loader` scope: at least one of eight native skill loaders rejects, drops or renames a
+    skill with that defect (list-typed fields, nested or non-string metadata, bad or
+    mismatched names, `---` inside the frontmatter, …);
+  - `sdk` scope: this format's own rules (unknown top-level keys, bare `Bash`, and for
+    managed folders the stamp, body hash and trailing newline).
+
+  `validate_attachment_path` checks bundle file paths. Duplicate YAML keys are rejected.
+- **Hashes and readers.** `body_sha256`, `description_sha256`, `render_hash` (over the fields
+  whose change is a new rendering: description, license, compatibility, allowed-tools and
+  invocation) and `lock_hash`. `taxonomy(frontmatter)` reads `metadata.decimalai-*` first,
+  then the legacy top-level keys.
+- **Golden vectors.** `tests/vectors/skillfmt_v1.json` holds inputs and expected outputs for
+  every function above. Regenerate it with `python -m skillevaluation.skillfmt --write-vectors`,
+  or check it with `--check-vectors`. A test asserts the regeneration is byte-identical.
+- **`skillevaluation scan` reads the category from `metadata` (behavior change).**
+  `metadata.decimalai-category` wins, then a top-level `category`. A security-category skill
+  written in format 1 now gets the same downgrade a top-level `category: security` always
+  got. A non-string `category` (a YAML list, say) is treated as no category; it used to crash
+  the scan with `AttributeError`.
+- **Safety scanner version 6 (behavior change): a homoglyph is a mixed-script word.**
+  `unicode_homoglyph` used to flag any URL or code span with a Cyrillic or Greek character
+  anywhere beside ASCII letters, which flagged math notation (`σ`, `Σ`). It now flags a
+  foreign letter inside an otherwise-ASCII word (`аpt`, `pаypal`). `SCANNER_VERSION` 5 → 6.
+- **A run that measured nothing reports no averages (behavior change).** When every case
+  errored or was skipped as not comparable, `duration_ms`, `turns` and `tokens` are now
+  `null`, as `pass_rate` already was. They used to be `0.0`, an average of an empty set that
+  read as a measurement.
 
 Parser — `expect_exit_code` is now type-checked. **Behavior change:** a validator whose
 `expect_exit_code` is not an integer is rejected at parse time instead of being silently

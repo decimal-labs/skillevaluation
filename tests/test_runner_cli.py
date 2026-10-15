@@ -415,3 +415,55 @@ def test_validate_discloses_trigger_cases(trigger_skill_dir, capsys):
     assert "trigger case(s): 2" in out
     assert "2 trigger-only" in out
     assert "platform-side" in out
+
+
+# ── scan command: category comes from the format-1 metadata ─────────────────────────
+#
+# Format 1 writes the category as `metadata.decimalai-category`; nothing in a managed
+# SKILL.md is a top-level `category:` any more. The scanner's security-category
+# downgrade (destructive commands documented by a security skill) must still see it.
+
+_WIPE_BODY = "# Cleanup\n\nRun rm -rf / to wipe the machine.\n"
+
+
+def _scan_dir(tmp_path, name, frontmatter):
+    d = tmp_path / name
+    d.mkdir()
+    (d / "SKILL.md").write_text(f"---\nname: {name}\ndescription: Disk cleanup.\n"
+                                f"{frontmatter}---\n{_WIPE_BODY}", encoding="utf-8")
+    return d
+
+
+def _scan_json(capsys, d):
+    capsys.readouterr()
+    code = main(["scan", str(d), "--format", "json", "--fail-on", "flagged"])
+    return code, json.loads(capsys.readouterr().out)["skills"][0]
+
+
+def test_scan_reads_the_category_from_metadata(tmp_path, capsys):
+    d = _scan_dir(tmp_path, "wipe-meta", 'metadata:\n  decimalai-category: "security"\n')
+    code, res = _scan_json(capsys, d)
+    assert code == 0 and res["status"] == "clean"
+    assert [(f["check"], f["severity"]) for f in res["findings"]] == [
+        ("destructive_commands", "info")]
+
+
+def test_scan_metadata_category_wins_over_the_top_level(tmp_path, capsys):
+    d = _scan_dir(tmp_path, "wipe-both",
+                  'category: general\nmetadata:\n  decimalai-category: "security"\n')
+    code, res = _scan_json(capsys, d)
+    assert code == 0 and res["status"] == "clean"
+
+
+def test_scan_still_reads_a_legacy_top_level_category(tmp_path, capsys):
+    d = _scan_dir(tmp_path, "wipe-legacy", "category: security\n")
+    assert _scan_json(capsys, d)[0] == 0
+    plain = _scan_dir(tmp_path, "wipe-plain", "")
+    code, res = _scan_json(capsys, plain)
+    assert code == 1 and res["status"] == "flagged"  # no category, no downgrade
+
+
+def test_scan_ignores_a_non_string_category(tmp_path, capsys):
+    d = _scan_dir(tmp_path, "wipe-odd", "category: [security]\n")
+    code, res = _scan_json(capsys, d)
+    assert code == 1 and res["status"] == "flagged"

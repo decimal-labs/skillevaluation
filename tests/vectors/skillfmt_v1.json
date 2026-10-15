@@ -1,0 +1,2510 @@
+{
+  "allowed_tools": [
+    {
+      "notes": [
+        "allowed-tools: rewrote 'Bash' to 1 scoped entry for the bundled scripts"
+      ],
+      "raw": [
+        "Read",
+        "Bash",
+        "Bash(git log *)",
+        "Write",
+        "mcp__x"
+      ],
+      "scripts": [
+        {
+          "content": "print(1)\n",
+          "executable": true,
+          "execution_language": null,
+          "path": "scripts/run.py"
+        }
+      ],
+      "tokens": [
+        "Read",
+        "Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/run.py *)",
+        "Bash(git log *)",
+        "Write",
+        "mcp__x"
+      ],
+      "value": "Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/run.py *) Bash(git log *) Write mcp__x",
+      "variant": "authored"
+    },
+    {
+      "notes": [
+        "allowed-tools: dropped 'Bash' (no bundled script to scope it to)"
+      ],
+      "raw": [
+        "Read",
+        "Bash",
+        "Bash(git log *)",
+        "Write",
+        "mcp__x"
+      ],
+      "scripts": [],
+      "tokens": [
+        "Read",
+        "Bash(git log *)",
+        "Write",
+        "mcp__x"
+      ],
+      "value": "Read Bash(git log *) Write mcp__x",
+      "variant": "authored"
+    },
+    {
+      "notes": [
+        "allowed-tools: dropped 'Bash' (not authored by your organization)",
+        "allowed-tools: dropped 'Bash(git log *)' (not authored by your organization)",
+        "allowed-tools: dropped 'Write' (not authored by your organization)",
+        "allowed-tools: dropped 'mcp__x' (not authored by your organization)"
+      ],
+      "raw": [
+        "Read",
+        "Bash",
+        "Bash(git log *)",
+        "Write",
+        "mcp__x"
+      ],
+      "scripts": [
+        {
+          "content": "print(1)\n",
+          "executable": true,
+          "execution_language": null,
+          "path": "scripts/run.py"
+        }
+      ],
+      "tokens": [
+        "Read"
+      ],
+      "value": "Read",
+      "variant": "foreign"
+    },
+    {
+      "notes": [
+        "allowed-tools: dropped 'Bash' (not authored by your organization)"
+      ],
+      "raw": [
+        "Read,",
+        "Grep,",
+        "Glob,",
+        "Bash,"
+      ],
+      "scripts": [],
+      "tokens": [
+        "Read",
+        "Grep",
+        "Glob"
+      ],
+      "value": "Read Grep Glob",
+      "variant": "foreign"
+    },
+    {
+      "notes": [
+        "allowed-tools: dropped 'mcp__acme-tools__core_memory(*)' (not authored by your organization)",
+        "allowed-tools: rewrote 'Read(*)' to 'Read' (a wildcard scope is the bare tool)",
+        "allowed-tools: dropped 'AskUserQuestion' (not authored by your organization)"
+      ],
+      "raw": [
+        "mcp__acme-tools__core_memory(*),",
+        "Read(*),",
+        "AskUserQuestion"
+      ],
+      "scripts": [],
+      "tokens": [
+        "Read"
+      ],
+      "value": "Read",
+      "variant": "foreign"
+    },
+    {
+      "notes": [],
+      "raw": [
+        "mcp__acme-tools__core_memory(*),",
+        "Read(*),",
+        "AskUserQuestion"
+      ],
+      "scripts": [],
+      "tokens": [
+        "mcp__acme-tools__core_memory(*)",
+        "Read(*)",
+        "AskUserQuestion"
+      ],
+      "value": "mcp__acme-tools__core_memory(*) Read(*) AskUserQuestion",
+      "variant": "authored"
+    },
+    {
+      "notes": [
+        "allowed-tools: dropped 'Agent(*)' (not authored by your organization)",
+        "allowed-tools: rewrote 'Read(*)' to 'Read' (a wildcard scope is the bare tool)",
+        "allowed-tools: dropped 'Write(*)' (not authored by your organization)",
+        "allowed-tools: dropped 'Bash(*)' (not authored by your organization)",
+        "allowed-tools: rewrote 'Glob(*)' to 'Glob' (a wildcard scope is the bare tool)",
+        "allowed-tools: rewrote 'Grep( ** )' to 'Grep' (a wildcard scope is the bare tool)"
+      ],
+      "raw": [
+        "Agent(*),",
+        "Read(*),",
+        "Write(*),",
+        "Bash(*),",
+        "Glob(*),",
+        "Grep( ** )"
+      ],
+      "scripts": [],
+      "tokens": [
+        "Read",
+        "Glob",
+        "Grep"
+      ],
+      "value": "Read Glob Grep",
+      "variant": "foreign"
+    },
+    {
+      "notes": [
+        "allowed-tools: dropped 'Read(./references/**)' (not authored by your organization)"
+      ],
+      "raw": [
+        "Read(./references/**)"
+      ],
+      "scripts": [],
+      "tokens": [],
+      "value": null,
+      "variant": "foreign"
+    },
+    {
+      "notes": [],
+      "raw": [
+        "Bash(git",
+        "log",
+        "*)",
+        "Read,"
+      ],
+      "scripts": [],
+      "tokens": [
+        "Bash(git log *)",
+        "Read"
+      ],
+      "value": "Bash(git log *) Read",
+      "variant": "authored"
+    },
+    {
+      "notes": [],
+      "raw": "Read, Bash(git diff, git log)",
+      "scripts": [],
+      "tokens": [
+        "Read",
+        "Bash(git diff, git log)"
+      ],
+      "value": "Read Bash(git diff, git log)",
+      "variant": "authored"
+    },
+    {
+      "notes": [
+        "allowed-tools: rewrote 'Bash(*:*)' to 3 scoped entries for the bundled scripts"
+      ],
+      "raw": [
+        "Bash(*:*)"
+      ],
+      "scripts": [
+        {
+          "content": "print(1)\n",
+          "executable": true,
+          "execution_language": null,
+          "path": "scripts/run.py"
+        },
+        {
+          "content": "x",
+          "executable": true,
+          "execution_language": null,
+          "path": "scripts/b.sh"
+        },
+        {
+          "content": "x",
+          "executable": true,
+          "execution_language": "javascript",
+          "path": "scripts/c"
+        }
+      ],
+      "tokens": [
+        "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/b.sh *)",
+        "Bash(node ${CLAUDE_SKILL_DIR}/scripts/c *)",
+        "Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/run.py *)"
+      ],
+      "value": "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/b.sh *) Bash(node ${CLAUDE_SKILL_DIR}/scripts/c *) Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/run.py *)",
+      "variant": "authored"
+    },
+    {
+      "notes": [],
+      "raw": null,
+      "scripts": [],
+      "tokens": [],
+      "value": null,
+      "variant": "foreign"
+    }
+  ],
+  "attachment_paths": [
+    {
+      "path": "scripts/a.py",
+      "problems": []
+    },
+    {
+      "path": "references/sub/b.md",
+      "problems": []
+    },
+    {
+      "path": "templates/SKILL.md",
+      "problems": [
+        [
+          "F15",
+          "loader"
+        ]
+      ]
+    },
+    {
+      "path": "references/skill.md",
+      "problems": [
+        [
+          "F15",
+          "loader"
+        ]
+      ]
+    },
+    {
+      "path": "SKILL.md",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ],
+        [
+          "F15",
+          "loader"
+        ]
+      ]
+    },
+    {
+      "path": "../x",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "/etc/passwd",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "scripts/./x",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "scripts\\x",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "eval.yaml",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "notes/x.md",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "scripts",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ]
+      ]
+    },
+    {
+      "path": "references/SKILL.md/notes.md",
+      "problems": [
+        [
+          "F15",
+          "loader"
+        ]
+      ]
+    },
+    {
+      "path": "../../SKILL.md",
+      "problems": [
+        [
+          "F14",
+          "sdk"
+        ],
+        [
+          "F15",
+          "loader"
+        ]
+      ]
+    }
+  ],
+  "body_sha256": [
+    {
+      "body": "# T\n\nText",
+      "body_sha256": "67c34b99d8e18050910eae9d7e79774eab4bb685296a553857f1d491aacea585"
+    },
+    {
+      "body": "\n\n  # T\n\nText  \n\n",
+      "body_sha256": "67c34b99d8e18050910eae9d7e79774eab4bb685296a553857f1d491aacea585"
+    },
+    {
+      "body": "x\u2028",
+      "body_sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881"
+    },
+    {
+      "body": "# T\r\n\r\nText\r\n",
+      "body_sha256": "67c34b99d8e18050910eae9d7e79774eab4bb685296a553857f1d491aacea585"
+    },
+    {
+      "body": "a\rb\r\n",
+      "body_sha256": "7e18f737311b2dc3b2f269dd78396b0351f14fb66efa879f768cb23181883c78"
+    }
+  ],
+  "choose_install_name": [
+    {
+      "install_name": "acme-refund-policy",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {}
+    },
+    {
+      "install_name": "acme-refund-policy-a023c5",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "acme-refund-policy": "11aa0000-0000-4000-8000-000000000002"
+      }
+    },
+    {
+      "install_name": "acme-refund-policy-a023c5",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "acme-refund-policy": null
+      }
+    },
+    {
+      "install_name": "old-name",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "acme-refund-policy": null,
+        "old-name": "6f1c0000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "error": "install_name_collision",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "acme-refund-policy": "11aa0000-0000-4000-8000-000000000002",
+        "acme-refund-policy-a023c5": "22bb"
+      }
+    },
+    {
+      "error": "install_name_collision",
+      "name": "\u65e5\u672c\u8a9e\u30b9\u30ad\u30eb",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "skill-a023c5": "11aa0000-0000-4000-8000-000000000002"
+      }
+    },
+    {
+      "install_name": "acme-refund-policy-a023c5",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "Acme-Refund-Policy": null
+      }
+    },
+    {
+      "error": "install_name_collision",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "ACME-REFUND-POLICY-A023C5": null,
+        "Acme-Refund-Policy": null
+      }
+    },
+    {
+      "install_name": "Old-Name",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+      "taken": {
+        "Old-Name": "6f1c0000-0000-4000-8000-000000000001",
+        "acme-refund-policy": null
+      }
+    }
+  ],
+  "description": "Golden vectors for SKILL.md format 1, generated by `python -m skillevaluation.skillfmt --write-vectors`. Each section lists inputs and the outputs an implementation must produce. Replay: install_names (install_name_base / _disambiguated / _for), choose_install_name (taken = install name -> skill id or null), yaml_quote, allowed_tools (tokens, value, notes), render (fields + attachments -> bundle, with every file's exact content, sha256 and mode, plus trigger_fields), render_errors (must be refused), validate (sorted [rule, scope] pairs), attachment_paths, lock_hash, taxonomy and body_sha256. Rule ids and scopes are in `rules`.",
+  "format": 1,
+  "install_names": [
+    {
+      "base": "pdf-tools",
+      "disambiguated": "pdf-tools-a023c5",
+      "install_name": "pdf-tools",
+      "name": "pdf-tools",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "acme-refund-policy",
+      "disambiguated": "acme-refund-policy-a023c5",
+      "install_name": "acme-refund-policy",
+      "name": "acme/refund-policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "acme-refund-policy",
+      "disambiguated": "acme-refund-policy-a023c5",
+      "install_name": "acme-refund-policy",
+      "name": "Acme/Refund-Policy",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "my-skill-v2",
+      "disambiguated": "my-skill-v2-a023c5",
+      "install_name": "my-skill-v2",
+      "name": "my_skill.v2",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "docker-hub-automation",
+      "disambiguated": "docker-hub-automation-a023c5",
+      "install_name": "docker-hub-automation",
+      "name": "Docker Hub  Automation",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "weird-name",
+      "disambiguated": "weird-name-a023c5",
+      "install_name": "weird-name",
+      "name": "--weird--name--",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "unicode-tools",
+      "disambiguated": "unicode-tools-a023c5",
+      "install_name": "unicode-tools",
+      "name": "\u00dcn\u00efc\u00f6d\u00e9 Tools",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "cafe-creme-brulee",
+      "disambiguated": "cafe-creme-brulee-a023c5",
+      "install_name": "cafe-creme-brulee",
+      "name": "caf\u00e9/cr\u00e8me-br\u00fbl\u00e9e",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "",
+      "disambiguated": "skill-a023c5",
+      "install_name": "skill-a023c5",
+      "name": "\u65e5\u672c\u8a9e\u30b9\u30ad\u30eb",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "example-owner",
+      "disambiguated": "example-owner-a023c5",
+      "install_name": "example-owner-a023c5",
+      "name": "example-owner/\u4e2d\u6587\u6807\u9898",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "pdf-tools",
+      "disambiguated": "pdf-tools-a023c5",
+      "install_name": "pdf-tools-a023c5",
+      "name": "pdf \u4e2d\u6587 tools",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "acme",
+      "disambiguated": "acme-a023c5",
+      "install_name": "acme-a023c5",
+      "name": "acme/!!!",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "disambiguated": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-a023c5",
+      "install_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "disambiguated": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-a023c5",
+      "install_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-a023c5",
+      "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x",
+      "disambiguated": "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-a023c5",
+      "install_name": "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-a023c5",
+      "name": "x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "2slides-ppt-generator",
+      "disambiguated": "2slides-ppt-generator-a023c5",
+      "install_name": "2slides-ppt-generator",
+      "name": "2slides-ppt-generator",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "pdf-v2",
+      "disambiguated": "pdf-v2-a023c5",
+      "install_name": "pdf-v2",
+      "name": "pdf-v2",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "install",
+      "disambiguated": "install-a023c5",
+      "install_name": "install-a023c5",
+      "name": "install",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "search",
+      "disambiguated": "search-a023c5",
+      "install_name": "search-a023c5",
+      "name": "search",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "check",
+      "disambiguated": "check-a023c5",
+      "install_name": "check-a023c5",
+      "name": "check",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "decimalai-skills",
+      "disambiguated": "decimalai-skills-a023c5",
+      "install_name": "decimalai-skills-a023c5",
+      "name": "decimalai-skills",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "decimalai-skills",
+      "disambiguated": "decimalai-skills-a023c5",
+      "install_name": "decimalai-skills-a023c5",
+      "name": "decimalai/skills",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "404",
+      "disambiguated": "404-a023c5",
+      "install_name": "404-a023c5",
+      "name": "404",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "yes",
+      "disambiguated": "yes-a023c5",
+      "install_name": "yes-a023c5",
+      "name": "yes",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "null",
+      "disambiguated": "null-a023c5",
+      "install_name": "null-a023c5",
+      "name": "null",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "0x1f",
+      "disambiguated": "0x1f-a023c5",
+      "install_name": "0x1f-a023c5",
+      "name": "0x1f",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "2020-01-01",
+      "disambiguated": "2020-01-01-a023c5",
+      "install_name": "2020-01-01-a023c5",
+      "name": "2020-01-01",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "2020-13-45",
+      "disambiguated": "2020-13-45-a023c5",
+      "install_name": "2020-13-45-a023c5",
+      "name": "2020-13-45",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    },
+    {
+      "base": "some-github-owner-an-extremely-long-imported-skill-name-that-exceeds-the-limit",
+      "disambiguated": "some-github-owner-an-extremely-long-imported-skill-name-t-a023c5",
+      "install_name": "some-github-owner-an-extremely-long-imported-skill-name-t-a023c5",
+      "name": "some-github-owner/an-extremely-long-imported-skill-name-that-exceeds-the-limit",
+      "skill_id": "6f1c0000-0000-4000-8000-000000000001"
+    }
+  ],
+  "lock_hash": [
+    {
+      "lock_hash": "56befa5503ecdcda33e1a4a8263699d5ad45dc3ac22d16a78e077436e80d8b0a",
+      "root": ".agents/skills",
+      "skills": {
+        "acme-refund-policy": {
+          "body_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "description_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "executable": [],
+          "files": {
+            "SKILL.md": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          },
+          "installed_at": "2026-10-20T10:00:00Z",
+          "invocation": "model",
+          "name": "acme/refund-policy",
+          "path": ".agents/skills/acme-refund-policy",
+          "pin": "latest",
+          "render": {
+            "format": 1,
+            "hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "variant": "foreign"
+          },
+          "skill_id": "6f1c0000-0000-4000-8000-000000000001",
+          "source": {
+            "base_url": "https://api.decimal.ai",
+            "org": null
+          },
+          "unavailable": [],
+          "version": 3,
+          "version_id": "9b2e"
+        },
+        "skill-1687f4": {
+          "body_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "description_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "executable": [],
+          "files": {
+            "SKILL.md": "3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "installed_at": "2026-10-21T00:00:00Z",
+          "invocation": "user",
+          "name": "\u65e5\u672c\u8a9e\u30b9\u30ad\u30eb",
+          "path": ".agents/skills/skill-1687f4",
+          "pin": "exact",
+          "render": {
+            "format": 1,
+            "hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "variant": "foreign"
+          },
+          "skill_id": "11aa0000-0000-4000-8000-000000000002",
+          "source": {
+            "base_url": "https://api.decimal.ai",
+            "org": "org-1"
+          },
+          "unavailable": [
+            {
+              "path": "assets/x.png",
+              "reason": "binary attachments are not stored"
+            }
+          ],
+          "version": 1,
+          "version_id": "f00d"
+        }
+      }
+    }
+  ],
+  "render": [
+    {
+      "attachments": [
+        {
+          "content": "# Restocking fees\n\n| category | fee |\n|---|---|\n| electronics | 15% |\n| apparel | 0% |\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/fees.md"
+        },
+        {
+          "content": "#!/usr/bin/env python3\n\"\"\"compute_refund.py <amount> <days>\"\"\"\nimport sys\namount, days = float(sys.argv[1]), int(sys.argv[2])\nprint('REFUND full refund: %.2f' % amount if days <= 30 else\n      'REFUND store credit: %.2f' % amount if days <= 60 else 'REFUND none')\n",
+          "executable": true,
+          "execution_language": "python",
+          "path": "scripts/compute_refund.py"
+        }
+      ],
+      "bundle": {
+        "body_sha256": "9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09",
+        "description_sha256": "44d74c0fecb7fce62640cafe3a34bf93391867b75094f5d44f994a7d6022cb0e",
+        "files": [
+          {
+            "content": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "e4f1f4bbe9cb772623b3fc33c262f7505468bf20038ca6a2e232e363b2034d7f",
+            "size": 906
+          },
+          {
+            "content": "# Restocking fees\n\n| category | fee |\n|---|---|\n| electronics | 15% |\n| apparel | 0% |\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "references/fees.md",
+            "sha256": "0d8aa99276c4b9c973205d1107a5e3bd04555487e02daa2595d555a23ae00db6",
+            "size": 87
+          },
+          {
+            "content": "#!/usr/bin/env python3\n\"\"\"compute_refund.py <amount> <days>\"\"\"\nimport sys\namount, days = float(sys.argv[1]), int(sys.argv[2])\nprint('REFUND full refund: %.2f' % amount if days <= 30 else\n      'REFUND store credit: %.2f' % amount if days <= 60 else 'REFUND none')\n",
+            "encoding": "utf-8",
+            "mode": "0755",
+            "path": "scripts/compute_refund.py",
+            "sha256": "e4c111fbad47a07930bc7f45ed6517af668239020b1e6b4c8aab4da58ab25a5a",
+            "size": 264
+          }
+        ],
+        "install_name": "acme-refund-policy",
+        "invocation": "model",
+        "policy_notes": [
+          "allowed-tools: rewrote 'Bash' to 1 scoped entry for the bundled scripts"
+        ],
+        "render": {
+          "format": 1,
+          "hash": "5e7527d71bb486485891e9d22502ece9ef4f4a01a3551430b32536d6f2b5754f",
+          "variant": "authored"
+        },
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "unavailable": [],
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "reference-acme-refund-policy",
+      "install_name": "acme-refund-policy",
+      "trigger_fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0"
+      },
+      "variant": "authored"
+    },
+    {
+      "attachments": [],
+      "bundle": {
+        "body_sha256": "4d2818f52dea98bc6092107ab1aff32d4ff03ea95923eb6506950f79d3df7244",
+        "description_sha256": "b21a50a486c4a545708e6a0cd5f008b7bfc71efb4cf10d23a55d79aef0d61293",
+        "files": [
+          {
+            "content": "---\nname: acme-returns-desk\ndescription: \"Apply Acme returns desk rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\ndisable-model-invocation: true\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0001\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0001\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"4d2818f52dea98bc6092107ab1aff32d4ff03ea95923eb6506950f79d3df7244\"\n  decimalai-name: \"acme/returns-desk\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"user\"\n  decimalai-category: \"support\"\n---\n# Acme returns desk\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "4ae50bbee7dd104780d46931f0f48dff9442179915683545ad633447df86d877",
+            "size": 848
+          }
+        ],
+        "install_name": "acme-returns-desk",
+        "invocation": "user",
+        "policy_notes": [],
+        "render": {
+          "format": 1,
+          "hash": "b4953d3ba59ec3721f51835cc8e50ae3818fced5243efc33f664ca492b054eee",
+          "variant": "authored"
+        },
+        "skill_id": "00000000-0000-0000-0000-00005eed0001",
+        "unavailable": [],
+        "version_id": "00000000-0000-0000-0000-0000f00d0001"
+      },
+      "fields": {
+        "allowed_tools": null,
+        "body": "\n# Acme returns desk\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme returns desk rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "user",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/returns-desk",
+        "skill_id": "00000000-0000-0000-0000-00005eed0001",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0001"
+      },
+      "id": "reference-acme-returns-desk",
+      "install_name": "acme-returns-desk",
+      "trigger_fields": {
+        "allowed_tools": [],
+        "compatibility": "Requires python3",
+        "description": "Apply Acme returns desk rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "user",
+        "license": "Apache-2.0"
+      },
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "# Restocking fees\n\n| category | fee |\n|---|---|\n| electronics | 15% |\n| apparel | 0% |\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/fees.md"
+        },
+        {
+          "content": "#!/usr/bin/env python3\n\"\"\"compute_refund.py <amount> <days>\"\"\"\nimport sys\namount, days = float(sys.argv[1]), int(sys.argv[2])\nprint('REFUND full refund: %.2f' % amount if days <= 30 else\n      'REFUND store credit: %.2f' % amount if days <= 60 else 'REFUND none')\n",
+          "executable": true,
+          "execution_language": "python",
+          "path": "scripts/compute_refund.py"
+        }
+      ],
+      "bundle": {
+        "body_sha256": "6d817861fe4f168e82a235c9120425c678f4ee10188e2cf18cc87fa33ab1ab38",
+        "description_sha256": "43307bc8ebb751a786598376edded454555a0e9ba857edd84aa89cd0840a97e3",
+        "files": [
+          {
+            "content": "---\nname: some-github-owner-an-extremely-long-imported-skill-name-t-8544a6\ndescription: \"Apply Imported refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0002\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0002\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"6d817861fe4f168e82a235c9120425c678f4ee10188e2cf18cc87fa33ab1ab38\"\n  decimalai-name: \"some-github-owner/an-extremely-long-imported-skill-name-that-exceeds-the-limit\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Imported refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "a003a9a89c1ddfe7d7395998090fa52b0133377de22069a8eaa2dadb3756f5b9",
+            "size": 936
+          },
+          {
+            "content": "# Restocking fees\n\n| category | fee |\n|---|---|\n| electronics | 15% |\n| apparel | 0% |\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "references/fees.md",
+            "sha256": "0d8aa99276c4b9c973205d1107a5e3bd04555487e02daa2595d555a23ae00db6",
+            "size": 87
+          },
+          {
+            "content": "#!/usr/bin/env python3\n\"\"\"compute_refund.py <amount> <days>\"\"\"\nimport sys\namount, days = float(sys.argv[1]), int(sys.argv[2])\nprint('REFUND full refund: %.2f' % amount if days <= 30 else\n      'REFUND store credit: %.2f' % amount if days <= 60 else 'REFUND none')\n",
+            "encoding": "utf-8",
+            "mode": "0755",
+            "path": "scripts/compute_refund.py",
+            "sha256": "e4c111fbad47a07930bc7f45ed6517af668239020b1e6b4c8aab4da58ab25a5a",
+            "size": 264
+          }
+        ],
+        "install_name": "some-github-owner-an-extremely-long-imported-skill-name-t-8544a6",
+        "invocation": "model",
+        "policy_notes": [],
+        "render": {
+          "format": 1,
+          "hash": "0ac25e7ca844f66c1c6809966ad378e9443fabfa74cfce25269c3505f7922cc3",
+          "variant": "foreign"
+        },
+        "skill_id": "00000000-0000-0000-0000-00005eed0002",
+        "unavailable": [],
+        "version_id": "00000000-0000-0000-0000-0000f00d0002"
+      },
+      "fields": {
+        "allowed_tools": null,
+        "body": "\n# Imported refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Imported refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "some-github-owner/an-extremely-long-imported-skill-name-that-exceeds-the-limit",
+        "skill_id": "00000000-0000-0000-0000-00005eed0002",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0002"
+      },
+      "id": "reference-long-imported-name",
+      "install_name": "some-github-owner-an-extremely-long-imported-skill-name-t-8544a6",
+      "trigger_fields": {
+        "allowed_tools": [],
+        "compatibility": "Requires python3",
+        "description": "Apply Imported refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0"
+      },
+      "variant": "foreign"
+    },
+    {
+      "attachments": [],
+      "bundle": {
+        "body_sha256": "e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f",
+        "description_sha256": "4eac7c68df6ccc13ca557f0366b8558c3420f7ec8bf8e2e2484583f560e6afd1",
+        "files": [
+          {
+            "content": "---\nname: acme-tricky-quotes-aca9df\ndescription: \"- Use when \\\"quotes\\\", back\\\\slash, a: b, # hash, line\\u2028sep, nel\\u0085, bom\\ufeff, tab\\u0009, emoji \ud83c\udf89, \u4e2d\u6587, and a --\\u002d rule --\\u002d-\"\nlicense: \"Apache-2.0 OR MIT\"\nmetadata:\n  decimalai-skill-id: \"9a7b0000-0000-4000-8000-00000000000a\"\n  decimalai-version-id: \"9a7b0000-0000-4000-8000-0000000000b1\"\n  decimalai-version: \"7\"\n  decimalai-body-sha256: \"e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f\"\n  decimalai-name: \"acme/tricky \u2014 \u201cquotes\u201d\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"any\"\n  decimalai-category: \"security\"\n  decimalai-skill-scope: \"public\"\n  decimalai-skill-type: \"capability\"\n  decimalai-source: \"https://app.decimal.ai/s/acme-tricky@7/SKILL.md\"\n---\n# Body\n\nText.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "8c2c990aff1a242438dab797787dd5a0bcbf9c85e8c8a7753248239c973b3c0a",
+            "size": 774
+          }
+        ],
+        "install_name": "acme-tricky-quotes-aca9df",
+        "invocation": "model",
+        "policy_notes": [],
+        "render": {
+          "format": 1,
+          "hash": "86b7f3eb3daea4acceb0a18117c8a4b610fb8923e465a7bbbf39e7e8771cdab8",
+          "variant": "foreign"
+        },
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "unavailable": [],
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "fields": {
+        "allowed_tools": null,
+        "body": "# Body\n\nText.",
+        "category": "security",
+        "compatibility": null,
+        "description": "  - Use when \"quotes\", back\\slash, a: b, # hash,\n  line\u2028sep, nel\u0085, bom\ufeff, tab\t, emoji \ud83c\udf89, \u4e2d\u6587, and a --- rule ----  ",
+        "invocation_mode": "any",
+        "license": "Apache-2.0 OR MIT",
+        "license_spdx": null,
+        "registry_name": "acme/tricky \u2014 \u201cquotes\u201d",
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "skill_scope": "public",
+        "skill_type": "capability",
+        "source": "https://app.decimal.ai/s/acme-tricky@7/SKILL.md",
+        "version": 7,
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "id": "tricky-description-public",
+      "install_name": "acme-tricky-quotes-aca9df",
+      "trigger_fields": {
+        "allowed_tools": [],
+        "compatibility": null,
+        "description": "- Use when \"quotes\", back\\slash, a: b, # hash, line\u2028sep, nel\u0085, bom\ufeff, tab\t, emoji \ud83c\udf89, \u4e2d\u6587, and a --- rule ----",
+        "invocation_mode": "any",
+        "license": "Apache-2.0 OR MIT"
+      },
+      "variant": "foreign"
+    },
+    {
+      "attachments": [],
+      "bundle": {
+        "body_sha256": "e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f",
+        "description_sha256": "5197f20cf6e065ab343e307c819218f91b4225698f42c8dbd956e2a734e52413",
+        "files": [
+          {
+            "content": "---\nname: clipped-long-values\ndescription: \"word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word\"\ncompatibility: \"c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c\"\nmetadata:\n  decimalai-skill-id: \"9a7b0000-0000-4000-8000-00000000000a\"\n  decimalai-version-id: \"9a7b0000-0000-4000-8000-0000000000b1\"\n  decimalai-version: \"7\"\n  decimalai-body-sha256: \"e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f\"\n  decimalai-name: \"acme/tricky \u2014 \u201cquotes\u201d\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n---\n# Body\n\nText.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "1c8561813f132935b38f7c7abee90ed6b64f2e4014d9295abdad4f061a9ca476",
+            "size": 1961
+          }
+        ],
+        "install_name": "clipped-long-values",
+        "invocation": "model",
+        "policy_notes": [
+          "description: clipped from 1499 to 1024 characters",
+          "compatibility: clipped from 603 to 499 characters"
+        ],
+        "render": {
+          "format": 1,
+          "hash": "fdbcc043b17792a81fc47f3988330c950746a2088dd004f26fe408eccd018b30",
+          "variant": "foreign"
+        },
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "unavailable": [],
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "fields": {
+        "allowed_tools": null,
+        "body": "# Body\n\nText.",
+        "category": null,
+        "compatibility": [
+          "c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c ",
+          "uv"
+        ],
+        "description": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word",
+        "invocation_mode": "model",
+        "license": null,
+        "license_spdx": null,
+        "registry_name": "acme/tricky \u2014 \u201cquotes\u201d",
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 7,
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "id": "clipped-long-values",
+      "install_name": "clipped-long-values",
+      "trigger_fields": {
+        "allowed_tools": [],
+        "compatibility": "c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c",
+        "description": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word",
+        "invocation_mode": "model",
+        "license": null
+      },
+      "variant": "foreign"
+    },
+    {
+      "attachments": [
+        {
+          "content": "print(1)\n",
+          "executable": true,
+          "execution_language": null,
+          "path": "scripts/run.py"
+        }
+      ],
+      "bundle": {
+        "body_sha256": "e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f",
+        "description_sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+        "files": [
+          {
+            "content": "---\nname: damaged-tools\ndescription: \"x\"\nallowed-tools: \"Read Grep\"\nmetadata:\n  decimalai-skill-id: \"9a7b0000-0000-4000-8000-00000000000a\"\n  decimalai-version-id: \"9a7b0000-0000-4000-8000-0000000000b1\"\n  decimalai-version: \"7\"\n  decimalai-body-sha256: \"e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f\"\n  decimalai-name: \"acme/tricky \u2014 \u201cquotes\u201d\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n---\n# Body\n\nText.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "8c31669228c265272e368e33e12670b957fc33ec110ece295f59962bb53b0e8a",
+            "size": 442
+          },
+          {
+            "content": "print(1)\n",
+            "encoding": "utf-8",
+            "mode": "0755",
+            "path": "scripts/run.py",
+            "sha256": "cc42155088fca5730758db72b2a5bca33112a941dfaa2d43098ec422ce4ea213",
+            "size": 9
+          }
+        ],
+        "install_name": "damaged-tools",
+        "invocation": "model",
+        "policy_notes": [
+          "allowed-tools: dropped 'Bash(git log *)' (not authored by your organization)",
+          "allowed-tools: dropped 'Write' (not authored by your organization)",
+          "allowed-tools: dropped 'mcp__github__create_issue' (not authored by your organization)"
+        ],
+        "render": {
+          "format": 1,
+          "hash": "5adada88bea2f2011f44b194a5ec034a071b4e9e789039a0fe4e13ea3a1efe7b",
+          "variant": "foreign"
+        },
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "unavailable": [],
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "fields": {
+        "allowed_tools": [
+          "Read,",
+          "Grep,",
+          "Bash(git",
+          "log",
+          "*)",
+          "Write",
+          "mcp__github__create_issue"
+        ],
+        "body": "# Body\n\nText.",
+        "category": null,
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "model",
+        "license": null,
+        "license_spdx": null,
+        "registry_name": "acme/tricky \u2014 \u201cquotes\u201d",
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 7,
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "id": "foreign-damaged-allowed-tools",
+      "install_name": "damaged-tools",
+      "trigger_fields": {
+        "allowed_tools": [
+          "Read",
+          "Grep",
+          "Bash(git log *)",
+          "Write",
+          "mcp__github__create_issue"
+        ],
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "model",
+        "license": null
+      },
+      "variant": "foreign"
+    },
+    {
+      "attachments": [
+        {
+          "content": "print(1)\n",
+          "executable": true,
+          "execution_language": null,
+          "path": "scripts/a.py"
+        },
+        {
+          "content": "echo b\n",
+          "executable": true,
+          "execution_language": "bash",
+          "path": "scripts/b.sh"
+        },
+        {
+          "content": "not executable\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "scripts/notes.txt"
+        },
+        {
+          "content": "# R\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/r.md"
+        }
+      ],
+      "bundle": {
+        "body_sha256": "e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f",
+        "description_sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+        "files": [
+          {
+            "content": "---\nname: authored-tools\ndescription: \"x\"\nlicense: \"MIT\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/a.py *) Bash(bash ${CLAUDE_SKILL_DIR}/scripts/b.sh *) Write\"\nmetadata:\n  decimalai-skill-id: \"9a7b0000-0000-4000-8000-00000000000a\"\n  decimalai-version-id: \"9a7b0000-0000-4000-8000-0000000000b1\"\n  decimalai-version: \"7\"\n  decimalai-body-sha256: \"e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f\"\n  decimalai-name: \"acme/tricky \u2014 \u201cquotes\u201d\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n---\n# Body\n\nText.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "af72bc70d9c756cb9cd2f8bf9e91caf882d009451eacc39e65672038148b2545",
+            "size": 554
+          },
+          {
+            "content": "# R\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "references/r.md",
+            "sha256": "3203e738731f57fb9a1289bd08c17bc50d8de842c64ae0122be9fa2e6931fb9e",
+            "size": 4
+          },
+          {
+            "content": "print(1)\n",
+            "encoding": "utf-8",
+            "mode": "0755",
+            "path": "scripts/a.py",
+            "sha256": "cc42155088fca5730758db72b2a5bca33112a941dfaa2d43098ec422ce4ea213",
+            "size": 9
+          },
+          {
+            "content": "echo b\n",
+            "encoding": "utf-8",
+            "mode": "0755",
+            "path": "scripts/b.sh",
+            "sha256": "256931e5627bfa46347df35ae1c25649073ce5630975d0cdf9d301d32836a118",
+            "size": 7
+          },
+          {
+            "content": "not executable\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "scripts/notes.txt",
+            "sha256": "3847030cd76d446be97aad7113998f7b35efb51b3aa8246e407974d7acc2d7f5",
+            "size": 15
+          }
+        ],
+        "install_name": "authored-tools",
+        "invocation": "model",
+        "policy_notes": [
+          "allowed-tools: rewrote 'Bash(*)' to 2 scoped entries for the bundled scripts"
+        ],
+        "render": {
+          "format": 1,
+          "hash": "1c872640cbd31b6007ae6da42e6b4a7673ef88817ab015b35173e5cda86e5fff",
+          "variant": "authored"
+        },
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "unavailable": [],
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash(*)",
+          "Write"
+        ],
+        "body": "# Body\n\nText.",
+        "category": null,
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "model",
+        "license": "Some long license text",
+        "license_spdx": "MIT",
+        "registry_name": "acme/tricky \u2014 \u201cquotes\u201d",
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 7,
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "id": "authored-bare-bash-scoped",
+      "install_name": "authored-tools",
+      "trigger_fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash(*)",
+          "Write"
+        ],
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "model",
+        "license": "MIT"
+      },
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": null,
+          "executable": false,
+          "execution_language": null,
+          "path": "assets/logo.png"
+        },
+        {
+          "content": "---\nname: x\n---\nx\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "templates/SKILL.md"
+        },
+        {
+          "content": "line\r\nline\r\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "templates/t.md"
+        },
+        {
+          "content": "\u00f1\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/deep/er/n.md"
+        },
+        {
+          "content": "under a folder\n",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/SKILL.md/notes.md"
+        }
+      ],
+      "bundle": {
+        "body_sha256": "e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f",
+        "description_sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+        "files": [
+          {
+            "content": "---\nname: attachments\ndescription: \"x\"\ndisable-model-invocation: true\nmetadata:\n  decimalai-skill-id: \"9a7b0000-0000-4000-8000-00000000000a\"\n  decimalai-version-id: \"9a7b0000-0000-4000-8000-0000000000b1\"\n  decimalai-version: \"7\"\n  decimalai-body-sha256: \"e41e27bb2bf7384ef7872c23245650fbad95e1736607919c48787113f9d2e82f\"\n  decimalai-name: \"acme/tricky \u2014 \u201cquotes\u201d\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"user\"\n---\n# Body\n\nText.\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "d4fb7228d082468187422f8ec47ec65fb240f5ec18642ec3c474d04cfc125210",
+            "size": 443
+          },
+          {
+            "content": "\u00f1\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "references/deep/er/n.md",
+            "sha256": "f69bf8ad864bd73c5a20e498ddaac6470299c182924a5bc0994687160eec4e4a",
+            "size": 3
+          },
+          {
+            "content": "line\r\nline\r\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "templates/t.md",
+            "sha256": "dff0bb943d94840b9392ced3cad89fca80a45520b8f7d72525952ac8f969b18f",
+            "size": 12
+          }
+        ],
+        "install_name": "attachments",
+        "invocation": "user",
+        "policy_notes": [],
+        "render": {
+          "format": 1,
+          "hash": "7481d99314d59099144bd467464dd9a1bcdb16d030d65a637f048d9cef26fae4",
+          "variant": "foreign"
+        },
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "unavailable": [
+          {
+            "path": "assets/logo.png",
+            "reason": "binary attachments are not stored"
+          },
+          {
+            "path": "references/SKILL.md/notes.md",
+            "reason": "a file or folder named SKILL.md inside a skill would load as a second skill, so it is never written"
+          },
+          {
+            "path": "templates/SKILL.md",
+            "reason": "a file or folder named SKILL.md inside a skill would load as a second skill, so it is never written"
+          }
+        ],
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "fields": {
+        "allowed_tools": null,
+        "body": "# Body\n\nText.",
+        "category": null,
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "user",
+        "license": null,
+        "license_spdx": null,
+        "registry_name": "acme/tricky \u2014 \u201cquotes\u201d",
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 7,
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "id": "attachments-binary-and-nested-skill-md",
+      "install_name": "attachments",
+      "trigger_fields": {
+        "allowed_tools": [],
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "user",
+        "license": null
+      },
+      "variant": "foreign"
+    },
+    {
+      "attachments": [],
+      "bundle": {
+        "body_sha256": "e347f4f1ba7999420a3da41c163a01cc4033a3d29a0ae465be47b2142cd9efdb",
+        "description_sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+        "files": [
+          {
+            "content": "---\nname: crlf-body\ndescription: \"x\"\nmetadata:\n  decimalai-skill-id: \"9a7b0000-0000-4000-8000-00000000000a\"\n  decimalai-version-id: \"9a7b0000-0000-4000-8000-0000000000b1\"\n  decimalai-version: \"7\"\n  decimalai-body-sha256: \"e347f4f1ba7999420a3da41c163a01cc4033a3d29a0ae465be47b2142cd9efdb\"\n  decimalai-name: \"acme/tricky \u2014 \u201cquotes\u201d\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n---\n# Body\n\nLine one\nline two\nline three\n",
+            "encoding": "utf-8",
+            "mode": "0644",
+            "path": "SKILL.md",
+            "sha256": "0e8bd8a30a629ade8d8edda4ca7702a2dd98972ce5e133ee629758339e55b763",
+            "size": 434
+          }
+        ],
+        "install_name": "crlf-body",
+        "invocation": "model",
+        "policy_notes": [
+          "body: wrote CR and CRLF line endings as LF"
+        ],
+        "render": {
+          "format": 1,
+          "hash": "ef76cc74ddba81bae3731c5a9ef0dc73e9d2eed1774147b767c54f6d5fd81f27",
+          "variant": "foreign"
+        },
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "unavailable": [],
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "fields": {
+        "allowed_tools": null,
+        "body": "\r\n# Body\r\n\r\nLine one\r\nline two\rline three\r\n",
+        "category": null,
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "model",
+        "license": null,
+        "license_spdx": null,
+        "registry_name": "acme/tricky \u2014 \u201cquotes\u201d",
+        "skill_id": "9a7b0000-0000-4000-8000-00000000000a",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 7,
+        "version_id": "9a7b0000-0000-4000-8000-0000000000b1"
+      },
+      "id": "crlf-body",
+      "install_name": "crlf-body",
+      "trigger_fields": {
+        "allowed_tools": [],
+        "compatibility": null,
+        "description": "x",
+        "invocation_mode": "model",
+        "license": null
+      },
+      "variant": "foreign"
+    }
+  ],
+  "render_errors": [
+    {
+      "attachments": [],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": " \n ",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "empty-description",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "empty-body",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "x",
+          "executable": false,
+          "execution_language": null,
+          "path": "../escape.md"
+        }
+      ],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "unsafe-path",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "x",
+          "executable": false,
+          "execution_language": null,
+          "path": "../../SKILL.md"
+        }
+      ],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "unsafe-path-named-skill-md",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "x",
+          "executable": false,
+          "execution_language": null,
+          "path": "/etc/SKILL.md"
+        }
+      ],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "absolute-path-named-skill-md",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "x",
+          "executable": false,
+          "execution_language": null,
+          "path": "eval.yaml"
+        }
+      ],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "path-outside-bundle-dirs",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "a",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/A.md"
+        },
+        {
+          "content": "b",
+          "executable": false,
+          "execution_language": null,
+          "path": "references/a.md"
+        }
+      ],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "case-insensitive-duplicate",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [
+        {
+          "content": "a",
+          "executable": false,
+          "execution_language": null,
+          "path": "scripts/tool"
+        },
+        {
+          "content": "b",
+          "executable": false,
+          "execution_language": null,
+          "path": "scripts/tool/x.py"
+        }
+      ],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "file-where-a-directory-goes",
+      "install_name": "acme-refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "install-name-not-a-folder-name",
+      "install_name": "acme/refund-policy",
+      "variant": "authored"
+    },
+    {
+      "attachments": [],
+      "error": "render_invalid",
+      "fields": {
+        "allowed_tools": [
+          "Read",
+          "Bash"
+        ],
+        "body": "\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n",
+        "category": "support",
+        "compatibility": "Requires python3",
+        "description": "Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.",
+        "invocation_mode": "model",
+        "license": "Apache-2.0",
+        "license_spdx": null,
+        "registry_name": "acme/refund-policy",
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "skill_scope": null,
+        "skill_type": null,
+        "source": null,
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "id": "install-name-read-as-a-number",
+      "install_name": "404",
+      "variant": "authored"
+    }
+  ],
+  "rules": {
+    "F1": [
+      "loader",
+      "UTF-8; the file starts with a line exactly '---' and a later line exactly '---' closes the frontmatter; no '---' inside the frontmatter; a YAML mapping with no duplicate keys"
+    ],
+    "F10": [
+      "loader",
+      "the body is non-empty"
+    ],
+    "F11": [
+      "sdk",
+      "managed: the decimalai-* metadata keys are present, well-formed and equal the lock entry"
+    ],
+    "F12": [
+      "sdk",
+      "managed: sha256 of the body (line endings read as LF, then stripped) equals decimalai-body-sha256 and the lock"
+    ],
+    "F13": [
+      "sdk",
+      "managed: LF line endings, and the file ends with exactly one newline"
+    ],
+    "F14": [
+      "sdk",
+      "an attachment path is relative and under scripts/, references/, templates/ or assets/, with no '..', '.' or empty segment, backslash or control character"
+    ],
+    "F15": [
+      "loader",
+      "no attachment path has a file or folder named SKILL.md (any case, any depth): a loader would read it as another skill"
+    ],
+    "F2": [
+      "sdk",
+      "top-level keys are a subset of name, description, license, compatibility, allowed-tools, disable-model-invocation, metadata"
+    ],
+    "F3": [
+      "loader",
+      "name is a string matching ^[a-z0-9]+(-[a-z0-9]+)*$, at most 64 characters, equal to the folder name"
+    ],
+    "F4": [
+      "loader",
+      "description is a non-empty string of at most 1024 characters"
+    ],
+    "F5": [
+      "loader",
+      "compatibility is a string of at most 500 characters"
+    ],
+    "F6a": [
+      "loader",
+      "allowed-tools is a string, not a list"
+    ],
+    "F6b": [
+      "sdk",
+      "allowed-tools has no bare Bash (Bash, Bash(*) or Bash(*:*))"
+    ],
+    "F7": [
+      "sdk",
+      "disable-model-invocation is absent or exactly true"
+    ],
+    "F8": [
+      "loader",
+      "metadata is a flat map of strings"
+    ],
+    "F9": [
+      "loader",
+      "license is a string"
+    ]
+  },
+  "taxonomy": [
+    {
+      "frontmatter": {
+        "category": "general",
+        "metadata": {
+          "decimalai-category": "security"
+        }
+      },
+      "taxonomy": {
+        "category": "security",
+        "invocation": null,
+        "skill_scope": null,
+        "skill_type": null
+      }
+    },
+    {
+      "frontmatter": {
+        "category": " general ",
+        "skill-scope": "private",
+        "skill-type": "model-gap"
+      },
+      "taxonomy": {
+        "category": "general",
+        "invocation": null,
+        "skill_scope": "private",
+        "skill_type": "model-gap"
+      }
+    },
+    {
+      "frontmatter": {
+        "invocation": "Any",
+        "metadata": {
+          "decimalai-invocation": "bogus"
+        }
+      },
+      "taxonomy": {
+        "category": null,
+        "invocation": "any",
+        "skill_scope": null,
+        "skill_type": null
+      }
+    },
+    {
+      "frontmatter": {
+        "disable-model-invocation": true
+      },
+      "taxonomy": {
+        "category": null,
+        "invocation": "user",
+        "skill_scope": null,
+        "skill_type": null
+      }
+    },
+    {
+      "frontmatter": {
+        "category": 3,
+        "metadata": "not a map"
+      },
+      "taxonomy": {
+        "category": null,
+        "invocation": null,
+        "skill_scope": null,
+        "skill_type": null
+      }
+    },
+    {
+      "frontmatter": {},
+      "taxonomy": {
+        "category": null,
+        "invocation": null,
+        "skill_scope": null,
+        "skill_type": null
+      }
+    }
+  ],
+  "validate": [
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "baseline",
+      "managed": false,
+      "problems": [],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": {
+        "body_sha256": "9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09",
+        "invocation": "model",
+        "name": "acme/refund-policy",
+        "render": {
+          "format": 1
+        },
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "folder_name": "acme-refund-policy",
+      "id": "baseline-managed",
+      "managed": true,
+      "problems": [],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "list allowed-tools",
+      "managed": false,
+      "problems": [
+        [
+          "F6a",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools:\n  - Read\n  - Bash\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "list compatibility",
+      "managed": false,
+      "problems": [
+        [
+          "F5",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility:\n  - \"python>=3.10\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "nested metadata",
+      "managed": false,
+      "problems": [
+        [
+          "F8",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai:\n    version: \"3\"\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "unquoted number in metadata",
+      "managed": false,
+      "problems": [
+        [
+          "F8",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: 3\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "namespaced name",
+      "managed": false,
+      "problems": [
+        [
+          "F3",
+          "loader"
+        ],
+        [
+          "F3",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme/refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy-v3",
+      "id": "folder != name",
+      "managed": false,
+      "problems": [
+        [
+          "F3",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "unknown top-level key",
+      "managed": false,
+      "problems": [
+        [
+          "F2",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\ndecimalai-version-id: \"x\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "uppercase name",
+      "managed": false,
+      "problems": [
+        [
+          "F3",
+          "loader"
+        ],
+        [
+          "F3",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: Acme-Refund-Policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "id": "name over 64",
+      "managed": false,
+      "problems": [
+        [
+          "F3",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme--refund",
+      "id": "double hyphen",
+      "managed": false,
+      "problems": [
+        [
+          "F3",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme--refund\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "404",
+      "id": "name read as a number",
+      "managed": false,
+      "problems": [
+        [
+          "F3",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: 404\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "description over 1024",
+      "managed": false,
+      "problems": [
+        [
+          "F4",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "empty description",
+      "managed": false,
+      "problems": [
+        [
+          "F4",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "compatibility over 500",
+      "managed": false,
+      "problems": [
+        [
+          "F5",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "license list",
+      "managed": false,
+      "problems": [
+        [
+          "F9",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense:\n  - MIT\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "metadata null value",
+      "managed": false,
+      "problems": [
+        [
+          "F8",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category:\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "empty body",
+      "managed": false,
+      "problems": [
+        [
+          "F10",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "'---' inside a value (ADK splits on it)",
+      "managed": false,
+      "problems": [
+        [
+          "F1",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"a --- b\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "duplicate key",
+      "managed": false,
+      "problems": [
+        [
+          "F1",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nname: again\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "no closing fence",
+      "managed": false,
+      "problems": [
+        [
+          "F1",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "byte-order mark",
+      "managed": false,
+      "problems": [
+        [
+          "F1",
+          "loader"
+        ]
+      ],
+      "text": "\ufeff---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "bare Bash",
+      "managed": false,
+      "problems": [
+        [
+          "F6b",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: Read Bash\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "Bash(*)",
+      "managed": false,
+      "problems": [
+        [
+          "F6b",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(*)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "disable-model-invocation false",
+      "managed": false,
+      "problems": [
+        [
+          "F7",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\ndisable-model-invocation: false\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": {
+        "body_sha256": "9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09",
+        "invocation": "model",
+        "name": "acme/refund-policy",
+        "render": {
+          "format": 1
+        },
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "version": 3,
+        "version_id": "00000000-0000-0000-0000-0000f00d0000"
+      },
+      "folder_name": "acme-refund-policy",
+      "id": "managed: body edited after install",
+      "managed": true,
+      "problems": [
+        [
+          "F12",
+          "sdk"
+        ],
+        [
+          "F12",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nEdited sentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "managed: two trailing newlines",
+      "managed": true,
+      "problems": [
+        [
+          "F13",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "managed: CRLF",
+      "managed": true,
+      "problems": [
+        [
+          "F13",
+          "sdk"
+        ]
+      ],
+      "text": "---\r\nname: acme-refund-policy\r\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\r\nlicense: \"Apache-2.0\"\r\ncompatibility: \"Requires python3\"\r\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\r\nmetadata:\r\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\r\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\r\n  decimalai-version: \"3\"\r\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\r\n  decimalai-name: \"acme/refund-policy\"\r\n  decimalai-format: \"1\"\r\n  decimalai-invocation: \"model\"\r\n  decimalai-category: \"support\"\r\n---\r\n# Acme refund policy\r\n\r\nSentinel: NATIVE-SENTINEL-7f3a\r\n\r\n- Returned within 30 days: full refund.\r\n- 31-60 days: store credit.\r\n- After 60 days: none.\r\n\r\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\r\n"
+    },
+    {
+      "expect": {
+        "body_sha256": "9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09",
+        "invocation": "model",
+        "name": "acme/refund-policy",
+        "render": {
+          "format": 1
+        },
+        "skill_id": "00000000-0000-0000-0000-00005eed0000",
+        "version": 4,
+        "version_id": "other"
+      },
+      "folder_name": "acme-refund-policy",
+      "id": "managed: lock names another version",
+      "managed": true,
+      "problems": [
+        [
+          "F11",
+          "sdk"
+        ],
+        [
+          "F11",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"model\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "managed: user-only stamp without disable-model-invocation",
+      "managed": true,
+      "problems": [
+        [
+          "F11",
+          "sdk"
+        ]
+      ],
+      "text": "---\nname: acme-refund-policy\ndescription: \"Apply Acme refund policy rules when a customer asks for a refund, a return or store credit.\"\nlicense: \"Apache-2.0\"\ncompatibility: \"Requires python3\"\nallowed-tools: \"Read Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/compute_refund.py *)\"\nmetadata:\n  decimalai-skill-id: \"00000000-0000-0000-0000-00005eed0000\"\n  decimalai-version-id: \"00000000-0000-0000-0000-0000f00d0000\"\n  decimalai-version: \"3\"\n  decimalai-body-sha256: \"9ac82bcbf6107c995d58ff6088b518143c47a8f9952df60575fec8217acf4b09\"\n  decimalai-name: \"acme/refund-policy\"\n  decimalai-format: \"1\"\n  decimalai-invocation: \"user\"\n  decimalai-category: \"support\"\n---\n# Acme refund policy\n\nSentinel: NATIVE-SENTINEL-7f3a\n\n- Returned within 30 days: full refund.\n- 31-60 days: store credit.\n- After 60 days: none.\n\nFor fees read references/fees.md. To compute a refund, run scripts/compute_refund.py <amount> <days>.\n"
+    },
+    {
+      "expect": null,
+      "folder_name": "acme-refund-policy",
+      "id": "sdk 0.13.9 export",
+      "managed": false,
+      "problems": [
+        [
+          "F2",
+          "sdk"
+        ],
+        [
+          "F2",
+          "sdk"
+        ],
+        [
+          "F3",
+          "loader"
+        ],
+        [
+          "F3",
+          "loader"
+        ],
+        [
+          "F6a",
+          "loader"
+        ]
+      ],
+      "text": "---\nname: acme/refund-policy\ndescription: \"Apply Acme's refund rules when a customer asks for a refund.\"\ninvocation: user\ndisable-model-invocation: true\nlicense: Apache-2.0\nallowed-tools:\n  - Read\n  - Bash\nsource: https://app.decimal.ai/s/x\n---\n\n# Refund policy\n\nBody."
+    }
+  ],
+  "vectors_version": 1,
+  "yaml_quote": [
+    {
+      "input": "plain words",
+      "output": "\"plain words\""
+    },
+    {
+      "input": "",
+      "output": "\"\""
+    },
+    {
+      "input": "say \"hi\"",
+      "output": "\"say \\\"hi\\\"\""
+    },
+    {
+      "input": "back\\slash",
+      "output": "\"back\\\\slash\""
+    },
+    {
+      "input": "a: b",
+      "output": "\"a: b\""
+    },
+    {
+      "input": "- leading",
+      "output": "\"- leading\""
+    },
+    {
+      "input": "# leading",
+      "output": "\"# leading\""
+    },
+    {
+      "input": "line\u2028sep",
+      "output": "\"line\\u2028sep\""
+    },
+    {
+      "input": "para\u2029sep",
+      "output": "\"para\\u2029sep\""
+    },
+    {
+      "input": "nel\u0085",
+      "output": "\"nel\\u0085\""
+    },
+    {
+      "input": "bom\ufeff",
+      "output": "\"bom\\ufeff\""
+    },
+    {
+      "input": "tab\t",
+      "output": "\"tab\\u0009\""
+    },
+    {
+      "input": "nl\n",
+      "output": "\"nl\\u000a\""
+    },
+    {
+      "input": "cr\r",
+      "output": "\"cr\\u000d\""
+    },
+    {
+      "input": "nul\u0000",
+      "output": "\"nul\\u0000\""
+    },
+    {
+      "input": "del\u007f",
+      "output": "\"del\\u007f\""
+    },
+    {
+      "input": "c1\u0080\u009f",
+      "output": "\"c1\\u0080\\u009f\""
+    },
+    {
+      "input": "nonchar\ufffe\uffff",
+      "output": "\"nonchar\\ufffe\\uffff\""
+    },
+    {
+      "input": "emoji \ud83c\udf89 \u4e2d\u6587 \u00f1",
+      "output": "\"emoji \ud83c\udf89 \u4e2d\u6587 \u00f1\""
+    },
+    {
+      "input": "---",
+      "output": "\"--\\u002d\""
+    },
+    {
+      "input": "------",
+      "output": "\"--\\u002d--\\u002d\""
+    },
+    {
+      "input": "a --- b",
+      "output": "\"a --\\u002d b\""
+    },
+    {
+      "input": "--x---y----",
+      "output": "\"--x--\\u002dy--\\u002d-\""
+    },
+    {
+      "input": "yes",
+      "output": "\"yes\""
+    },
+    {
+      "input": "123",
+      "output": "\"123\""
+    }
+  ]
+}

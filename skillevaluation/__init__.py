@@ -8,6 +8,7 @@ Public API:
     from skillevaluation.baseline import baseline_cache_key
     from skillevaluation.trajectory.format_v1 import build_transcript_v1, FORMAT_VERSION
     from skillevaluation.resources import load_schema, read_spec
+    from skillevaluation import skillfmt   # the on-disk SKILL.md format: names, bytes, checks
 
 Reference runner (install the ``runner`` extra for the LLM-backed parts):
 
@@ -24,4 +25,4 @@ Or from a shell::
 See https://github.com/decimal-labs/skillevaluation for the spec.
 """
 
-__version__ = "0.7.1"
+__version__ = "0.8.0"
