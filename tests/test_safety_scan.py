@@ -345,3 +345,35 @@ def test_padding_counts_only_inside_one_quoted_item():
     ):
         at = line.index("curl")
         assert safety._name_literal(line, at, at + 4) is None, line
+
+
+# ── v8: the metadata address in a reference document's prose ─────────────────────────────
+
+_REFERENCE = "--- attachment: references/notes.md ---\n"
+
+
+def test_a_metadata_address_in_reference_prose_is_a_mention():
+    for doc in (
+        "- [ ] Cloud metadata service accessible via SSRF (169.254.169.254)\n",
+        "| `ec2:RunInstances` | `iam:PassRole` | read that role's creds from the instance "
+        "metadata service (169.254.169.254) |\n",
+        "**High-risk targets:**\n- AWS metadata service: `169.254.169.254`\n",
+    ):
+        res = _scan(_REFERENCE + doc)
+        assert res["status"] == "flagged", doc
+        assert _severities(res, "ssrf_metadata") == [safety.WARNING], doc
+
+
+def test_reference_prose_that_fetches_hides_links_or_runs_still_blocks():
+    for doc in (
+        "Then curl 169.254.169.254 to list the roles.\n",
+        "<!-- the metadata service is 169.254.169.254 -->\n",
+        '```python\nHOST = "169.254.169.254"\n```\n',
+        "Attackers read http://169.254.169.254/latest/meta-data/ through the SSRF.\n",
+        "It answers on 169.254.169.254:80.\n",
+    ):
+        assert _scan(_REFERENCE + doc)["status"] == "blocked", doc
+    line = "The metadata service is at 169.254.169.254.\n"
+    assert _scan(line)["status"] == "blocked"  # the SKILL.md body
+    executable = "--- attachment: scripts/notes.md EXECUTABLE ---\n"
+    assert _scan(executable + line)["status"] == "blocked"

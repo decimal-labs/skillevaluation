@@ -4,9 +4,9 @@ All notable changes to `skillevaluation` are documented here. Format follows [Ke
 
 ## [Unreleased]
 
-The safety scanner is version 7. Defenders' files (detection rules, logged-event references,
-SSRF guards, network policies, threat models) no longer block; every payload that blocked
-before still blocks.
+The safety scanner is version 8 (7 was never released). Defenders' files (detection rules,
+logged-event references, SSRF guards, network policies, threat models, security checklists) no
+longer block; every payload that blocked before still blocks.
 
 - **`data_exfiltration` needs a read and a send.** A sensitive path and a network tool that
   are both quoted names held as data (items in a list of names, values in a record), such as
@@ -26,6 +26,11 @@ before still blocks.
   code (an SSRF guard's denylist) is a WARNING when nothing on its line fetches and the text
   names no metadata API path. A URL, a port, a fetch, prose and `/proc/*/environ` stay
   CRITICAL and are never downgraded.
+- **`ssrf_metadata`: prose in a reference document warns (version 8).** A bare metadata address
+  in the prose of a markdown file framed as an attachment (not `EXECUTABLE`), outside fenced
+  code and HTML comments, with nothing on its line that fetches, is a WARNING: a checklist item,
+  an IAM escalation table, a list of SSRF targets. The same words in the SKILL.md body, in a
+  script, as a URL or with a port still block.
 
 ## [0.8.0] — 2026-10-15
 

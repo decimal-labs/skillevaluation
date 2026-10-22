@@ -86,7 +86,13 @@ from typing import Any
 #                  (an SSRF denylist) is not a request: recorded as a WARNING, unless the
 #                  line fetches something or the text names the metadata API's paths
 #                  (_metadata_address_mentioned). Prose that names it still blocks.
-SCANNER_VERSION = "7"
+# v8 (2026-10-22): a bare metadata ADDRESS in the PROSE of a markdown reference attachment is a
+#                  WARNING, not a block: a security checklist item ("Cloud metadata service
+#                  accessible via SSRF (169.254.169.254)"), an IAM escalation table, a
+#                  vulnerability catalog's list of SSRF targets (_named_in_reference_prose).
+#                  Unchanged: the URL form, ports, /proc/*/environ, a line that fetches, an HTML
+#                  comment, fenced code, scripts, and the SKILL.md body all keep v7's rules.
+SCANNER_VERSION = "8"
 
 # Severity ladder. The caller maps status → action (block / warn / show).
 CRITICAL = "critical"
@@ -538,8 +544,9 @@ _SSRF_METADATA: list[tuple[str, re.Pattern[str]]] = [
 #     an SSRF guard's denylist, `{"localhost", "127.0.0.1", "metadata.google.internal"}`.
 #     A comment in markdown prose does not count: `<!-- -->` is hidden from a human reader
 #     and still read by an agent.
-# Prose that names the address stays CRITICAL — prose is where an agent takes instructions,
-# and an agent knows the metadata API's paths without being told them.
+# Prose that names the address stays CRITICAL in the SKILL.md body — prose is where an agent takes
+# instructions, and an agent knows the metadata API's paths without being told them. Since v8, the
+# prose of a markdown reference attachment is the exception: _named_in_reference_prose.
 _METADATA_API = re.compile(
     r"(?i)/latest/(?:meta-data|user-data|dynamic|api/token)|/computeMetadata/|"
     r"/metadata/(?:instance|identity|v1)\b|/openstack/latest\b|security-credentials|"
@@ -782,6 +789,57 @@ _MD_HEADING = re.compile(r"(?m)^[ \t]{0,3}(#{1,6})[ \t]+(.+?)[ \t#]*$")
 _REFERENCE_DOC_SUFFIXES = (".md", ".markdown", ".mdx")
 
 
+def _reference_doc_header(text: str, idx: int) -> re.Match[str] | None:
+    """The attachment separator above ``idx`` when ``idx`` lies in a markdown reference document:
+    a `.md`/`.markdown`/`.mdx` attachment the caller did not frame EXECUTABLE. None in the
+    SKILL.md body, in a script, or in any other file."""
+    header = None
+    for header in _FRAME_HEADER.finditer(text, 0, idx):
+        pass
+    if header is None or " EXECUTABLE" in header.group(0):
+        return None
+    path = re.match(r"---\s*attachment:\s*(\S+)", header.group(0))
+    if not path or not path.group(1).lower().endswith(_REFERENCE_DOC_SUFFIXES):
+        return None
+    return header
+
+
+def _named_in_reference_prose(
+    text: str, match_start: int, match_end: int, code_spans: list[tuple[int, int]]
+) -> bool:
+    """v8: a bare metadata address in the PROSE of a markdown reference document is a mention.
+
+    Defensive documents name it this way: a checklist item ("Cloud metadata service accessible
+    via SSRF (169.254.169.254)"), an IAM escalation table ("read that role's creds from the
+    instance metadata service (169.254.169.254)"), a list of SSRF targets ("AWS metadata
+    service: `169.254.169.254`").
+
+    Prose only. Not fenced code (code an agent may run), not an HTML comment (hidden from a
+    human reader, still read by an agent), not the SKILL.md body and not a script
+    (_reference_doc_header). And still a bare ADDRESS: no `scheme://` or `//` before it, no
+    `/path` or `:port` after it (a `/32` range is fine), and nothing on its line that fetches.
+    Unlike the v7 code rules, a metadata API path elsewhere in the text does not undo it: a
+    defensive document explains the paths it warns about, and in prose an agent needs no
+    written path to compose the request anyway, so that check would only keep defenders
+    blocked.
+    """
+    header = _reference_doc_header(text, match_start)
+    if header is None or _in_spans(match_start, code_spans):
+        return False
+    opened = text.rfind("<!--", header.end(), match_start)
+    if opened >= 0 and text.find("-->", opened, match_start) < 0:
+        return False
+    lo = text.rfind("\n", 0, match_start) + 1
+    hi = text.find("\n", match_end)
+    hi = len(text) if hi < 0 else hi
+    before, after = text[lo:match_start], text[match_end:hi]
+    if _URL_LEAD.search(before):
+        return False
+    if not _RANGE_SUFFIX.match(after) and after[:1] in ("/", ":"):
+        return False
+    return not _FETCH_ON_LINE.search(text[lo:hi])
+
+
 def _reference_section_headings(text: str, idx: int, code_spans: list[tuple[int, int]]) -> str:
     """The headings of every section enclosing ``idx`` — its title, its chapter, its section —
     when ``idx`` lies in a markdown REFERENCE attachment; "" anywhere else.
@@ -799,13 +857,8 @@ def _reference_section_headings(text: str, idx: int, code_spans: list[tuple[int,
     CRITICAL to a WARNING and never clears it), and they never touch NON_DOWNGRADABLE_CHECKS,
     which return before this is consulted.
     """
-    header = None
-    for header in _FRAME_HEADER.finditer(text, 0, idx):
-        pass
-    if header is None or " EXECUTABLE" in header.group(0):
-        return ""
-    path = re.match(r"---\s*attachment:\s*(\S+)", header.group(0))
-    if not path or not path.group(1).lower().endswith(_REFERENCE_DOC_SUFFIXES):
+    header = _reference_doc_header(text, idx)
+    if header is None:
         return ""
     chain: dict[int, str] = {}
     for h in _MD_HEADING.finditer(text, header.end(), idx):
@@ -1306,6 +1359,21 @@ def scan_skill_content(
                             f"Names a cloud metadata address without requesting it ({label}: "
                             "a network range, a code comment or a denylist entry, and nothing "
                             "on the line fetches it) — recorded, not blocked.",
+                            evidence=m.group(0),
+                            line=_line_of(text, m.start()),
+                        )
+                    )
+                    continue
+                if label == "cloud metadata endpoint" and _named_in_reference_prose(
+                    text, m.start(), m.end(), code_spans
+                ):
+                    findings.append(
+                        _finding(
+                            "ssrf_metadata",
+                            WARNING,
+                            f"Names a cloud metadata address in a reference document's prose "
+                            f"({label}: no URL, and nothing on the line fetches it) — recorded, "
+                            "not blocked.",
                             evidence=m.group(0),
                             line=_line_of(text, m.start()),
                         )
