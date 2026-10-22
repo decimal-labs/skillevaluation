@@ -2,6 +2,31 @@
 
 All notable changes to `skillevaluation` are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+The safety scanner is version 7. Defenders' files (detection rules, logged-event references,
+SSRF guards, network policies, threat models) no longer block; every payload that blocked
+before still blocks.
+
+- **`data_exfiltration` needs a read and a send.** A sensitive path and a network tool that
+  are both quoted names held as data (items in a list of names, values in a record), such as
+  an audit rule's watch-list beside a list of suspicious commands, are recorded at INFO. An
+  argument vector (`["curl", "-T", "/etc/shadow", url]`), a call (`open("/etc/shadow")`), a
+  `"command": "curl"` entry and an unquoted command still pair. A markdown table row is one
+  record: a sensitive path in one row no longer pairs with a word like "upload" in another.
+- **Narrower sources and sinks.** A public key (`id_rsa.pub`), a relative module import
+  (`./cookies.js`) and a project's own `.azure/` folder are no longer sources, and netcat is
+  the lowercase `nc` command, not the `${NC}` colour-reset variable of a shell script. Every
+  string version 7 matches there, version 6 matched too.
+- **Reference headings are doc context.** In a markdown file framed as an attachment (not the
+  body, not an `EXECUTABLE` file), the headings of the sections around a match count as doc
+  context, like the ±400-character window.
+- **`ssrf_metadata`: a mention is not a request.** A metadata address written as a network
+  range (`169.254.169.254/32`), in a code comment, or as a quoted host among other hosts in
+  code (an SSRF guard's denylist) is a WARNING when nothing on its line fetches and the text
+  names no metadata API path. A URL, a port, a fetch, prose and `/proc/*/environ` stay
+  CRITICAL and are never downgraded.
+
 ## [0.8.0] — 2026-10-15
 
 A new module, `skillevaluation.skillfmt`, defines the on-disk skill format: install names,

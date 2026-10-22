@@ -32,6 +32,7 @@ be *stricter*, never looser.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from datetime import datetime, timezone
 from typing import Any
 
@@ -60,7 +61,32 @@ from typing import Any
 #                  anywhere. The old rule badged math notation — Σ and σ next to ASCII in a
 #                  PERT estimate template made a pack starter read "caution". A look-alike
 #                  swap is a letter inside an otherwise-ASCII token, which is what it checks.
-SCANNER_VERSION = "6"
+# v7 (2026-10-22): false blocks on defenders' files, found by scanning skills' bundled files
+#                  (scripts/, references/, assets/) across a large registry. Each fix is
+#                  narrow, and every payload that blocked before still blocks.
+#                  (a) `data_exfiltration` needs something that READS a sensitive file and
+#                  SENDS it. A watch-list of paths beside a list of tool names, or a logged
+#                  event's `"path"` beside its `"binary"`, names both and does neither
+#                  (_named_as_data); a markdown table row is one record, so a path in one
+#                  row no longer pairs with a word like "upload" in the next.
+#                  (b) The sensitive-source list stops matching a public key
+#                  (`id_rsa.pub`), a relative module import (`./cookies.js`) and a project's
+#                  own `.azure/` folder (the Azure CLI's credentials live under the home
+#                  directory), and the netcat sink stops matching `${NC}`, the shell's
+#                  colour-reset variable. Each change only narrows the list.
+#                  (c) A markdown reference file earns doc context from the headings of
+#                  the sections around a match ("# Threat Model" > "## Known Attack
+#                  Patterns"), not only from the ±400-character window
+#                  (_reference_section_headings). The SKILL.md body and scripts are not
+#                  covered, and the marker list itself is unchanged.
+#                  (d) `ssrf_metadata` stays CRITICAL and undowngradable for every REQUEST
+#                  to a metadata service. Naming the address as a network range
+#                  (`169.254.169.254/32` in a NetworkPolicy's `except:`), in a code comment
+#                  (an SSRF guard explaining what it blocks) or among other hosts in code
+#                  (an SSRF denylist) is not a request: recorded as a WARNING, unless the
+#                  line fetches something or the text names the metadata API's paths
+#                  (_metadata_address_mentioned). Prose that names it still blocks.
+SCANNER_VERSION = "7"
 
 # Severity ladder. The caller maps status → action (block / warn / show).
 CRITICAL = "critical"
@@ -214,16 +240,185 @@ _REVERSE_SHELL_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
 # var to authenticate an API call (`Bearer {os.environ['X_API_KEY']}`) is normal
 # integration code, not exfiltration, and including it floods the gate with false
 # positives on legitimate connector skills (mailchimp, linkedin, …).
+#
+# v7: three entries named things that are not credentials.
+#   * A PUBLIC key. `id_rsa.pub` / `~/.ssh/id_ed25519.pub` is the half you hand out; a git
+#     setup script that checks `[ -f ~/.ssh/id_rsa.pub ]` reads no secret.
+#   * `/Cookies` inside a relative import. `import … from "./cookies.js"` is a module of the
+#     skill's own; a browser's cookie store is never reached by `./` (Chrome's
+#     `…/Default/Cookies`, Firefox's `…/cookies.sqlite` still match).
+#   * A project's `.azure/` folder (the Azure Developer CLI keeps its per-project
+#     environment config there, as `.env` holds a project's settings, which this list leaves
+#     out on purpose). The Azure CLI's credentials live under the home directory, so `.azure/`
+#     counts after `~`, `$HOME` or a home path, or when a token cache file is named.
+# Each change only narrows: every string v7 matches here, v6 matched too.
 _SENSITIVE_SOURCE = re.compile(
-    r"(?i)(~/\.ssh/id_|id_rsa\b|id_ed25519\b|\.aws/credentials|\.config/gcloud|\.azure/|"
-    r"login\.keychain|Keychains?/|/Cookies\b|Login\s+Data|wallet\.dat|MetaMask|Exodus|"
+    r"(?i)(~/\.ssh/id_(?![\w-]*\.pub\b)|id_rsa\b(?!\.pub\b)|id_ed25519\b(?!\.pub\b)|"
+    r"\.aws/credentials|\.config/gcloud|"
+    r"(?:~|\$HOME|\$\{HOME\}|/home/[^/\s]+|/Users/[^/\s]+|/root)/\.azure/|"
+    r"\.azure/(?:accessTokens|msal_token_cache|service_principal_entries)|"
+    r"login\.keychain|Keychains?/|(?<!\.)/Cookies\b|Login\s+Data|wallet\.dat|MetaMask|Exodus|"
     r"keystore\b|/etc/shadow|\.npmrc\b|\.pypirc\b|\.docker/config\.json)"
 )
 # Egress sinks the payload sends to.
+#
+# v7: `nc` is netcat only as the lowercase command. Matched case-insensitively it was every
+# `${NC}` in a shell script, the variable most scripts reset terminal colours with, so a
+# wallet-setup script's `echo -e "…keystore…${NC}"` lines paired "keystore" with "netcat".
 _EGRESS_SINK = re.compile(
     r"(?i)\b(?:curl|wget|fetch|requests\.(?:post|put)|http[s]?\.request|invoke-webrequest|"
-    r"upload|POST\s+http|nc\b|mail\s+-s|sendmail)\b"
+    r"upload|POST\s+http|(?<![$\{])(?-i:nc)\b|mail\s+-s|sendmail)\b"
 )
+
+# ── A name is not a use (v7) ─────────────────────────────────────────────────
+#
+# The exfiltration check pairs a sensitive source with a sink within 200 characters. That
+# proximity stands in for "reads the one and sends it with the other", and defenders'
+# files defeat it, because detecting exfiltration means listing exactly these words:
+#
+#     SENSITIVE_PATHS = ["/etc/passwd", "/etc/shadow", "/etc/sudoers"]      # auditd rules
+#     SUSPICIOUS_COMMANDS = ["curl", "wget", "nc", "ncat"]
+#
+#     {"binary": "/usr/bin/cat", "args": [{"file_arg": {"path": "/etc/shadow"}}]}  # eBPF event
+#     {"binary": "/usr/bin/curl", "status": 0}
+#
+# Nothing there reads a file or sends one: both ends are NAMES held as data. So when the
+# source AND every sink beside it are each a quoted bare name that is an item of a list
+# (with another name beside it) or a value in a record, the pairing is recorded at INFO.
+#
+# A use stays a use. `open("/etc/shadow")` is a call, not a list item. `["curl", "-T",
+# "/etc/shadow", url]` is an argument vector: the items beside `"curl"` and the path are a
+# flag and a variable, not names. `"command": "curl"` is a value under a key that runs it.
+# `requests.post(…)` and a bare `curl …` are not quoted at all. And a stealer's target
+# list still pairs with the call that uploads it: only a sink that is ALSO a name can be
+# excused.
+_QUOTE_CHARS = "\"'`"
+# The inside of a literal that only NAMES a file or a tool: a word or a path with no
+# whitespace, no shell or URL syntax. `"/etc/shadow"`, `'id_rsa'`, `"/usr/bin/curl"`,
+# `"requests.post"` qualify; `"file=@/etc/shadow"`, `"-T"`, `"https://x/upload"` do not.
+_NAME_LITERAL = re.compile(r"[\w.~/\\+\-]+")
+# Keys whose value is something to RUN: an MCP server's `"command": "curl"`, a task's `cmd:`.
+_COMMAND_KEY = re.compile(
+    r"(?i)command|cmd|exec\w*|executable|program|run|entrypoint|shell|script|args?|argv"
+)
+# A markdown table row. Each row is its own record; a path in one row and a sink in the
+# next are two facts, not one instruction (a secret-pattern catalog's `.npmrc` row sitting
+# above a "PyPI upload token" row). Matched from a line's start with `.match(text, lo, hi)`,
+# which anchors at `lo` (a `^` would not: it matches only at the string's real start).
+_TABLE_ROW = re.compile(r"[ \t]*\|.*\|")
+
+
+# What stands before an item's opening quote (after spaces), and after its closing one.
+# `(?m)` because these run with a start position, where a bare `^` would never match.
+_ITEM_OPENS = re.compile(r"(?m)(?:^|[\[{(,:=])[ \t]*$")
+_ITEM_CLOSES = re.compile(r"[ \t]*(?:[,\]})]|$)")
+
+
+def _is_name(inner: str) -> bool:
+    # Padding inside the quotes is allowed: a pattern list writes `"nc "` so that it does not
+    # match inside other words. `"curl -F x"` is still not a name.
+    inner = inner.strip(" \t")
+    return bool(_NAME_LITERAL.fullmatch(inner)) and not inner.startswith("-")
+
+
+def _name_literal(text: str, start: int, end: int) -> tuple[int, int] | None:
+    """(open, close) quote offsets of the literal on this line holding ``text[start:end]``,
+    when that literal is a bare name; else None."""
+    lo = text.rfind("\n", 0, start) + 1
+    hi = text.find("\n", end)
+    hi = len(text) if hi < 0 else hi
+    i = start - 1
+    while i >= lo and text[i] not in _QUOTE_CHARS and not text[i].isspace():
+        i -= 1
+    j = end
+    while j < hi and text[j] not in _QUOTE_CHARS and not text[j].isspace():
+        j += 1
+    # A name may be padded inside its quotes (`"nc "`: a pattern list's way to stay out of
+    # other words), but only where the quotes still bound one item, so that `"$U" curl "$V"`
+    # is not read as a quoted `curl`.
+    pi, pj = i, j
+    while pi >= lo and text[pi] in " \t":
+        pi -= 1
+    while pj < hi and text[pj] in " \t":
+        pj += 1
+    if (
+        (pi, pj) != (i, j)
+        and pi >= lo
+        and pj < hi
+        and text[pi] in _QUOTE_CHARS
+        and text[pj] == text[pi]
+        and _ITEM_OPENS.search(text, lo, pi)
+        and _ITEM_CLOSES.match(text, pj + 1, hi)
+    ):
+        i, j = pi, pj
+    if i < lo or j >= hi or text[i] not in _QUOTE_CHARS or text[j] != text[i]:
+        return None
+    return (i, j) if _is_name(text[i + 1 : j]) else None
+
+
+def _name_beside(
+    text: str, open_q: int, close_q: int, accept: Callable[[str], bool] | None = None
+) -> bool:
+    """Another bare-name literal (or whatever ``accept`` admits) is the item right before or
+    right after this one."""
+    accept = accept or _is_name
+    k = open_q - 1
+    while k >= 0 and text[k].isspace():
+        k -= 1
+    if k >= 0 and text[k] == ",":
+        k -= 1
+        while k >= 0 and text[k].isspace():
+            k -= 1
+        if k >= 0 and text[k] in _QUOTE_CHARS:
+            m = text.rfind(text[k], 0, k)
+            if m >= 0 and "\n" not in text[m:k] and accept(text[m + 1 : k]):
+                return True
+    k = close_q + 1
+    while k < len(text) and text[k].isspace():
+        k += 1
+    if k < len(text) and text[k] == ",":
+        k += 1
+        while k < len(text) and text[k].isspace():
+            k += 1
+        if k < len(text) and text[k] in _QUOTE_CHARS:
+            m = text.find(text[k], k + 1)
+            if m > 0 and "\n" not in text[k:m] and accept(text[k + 1 : m]):
+                return True
+    return False
+
+
+def _named_as_data(text: str, start: int, end: int) -> bool:
+    """``text[start:end]`` is a quoted bare name held as data — an item of a list of names, or
+    a value in a record — rather than something called, run or read. See the note above."""
+    span = _name_literal(text, start, end)
+    if span is None:
+        return False
+    open_q, close_q = span
+    k = open_q - 1
+    while k >= 0 and text[k].isspace():
+        k -= 1
+    if k >= 0 and text[k] == ":":
+        key = re.search(r"([\w\-]+)[\"'`]?\s*$", text[max(0, k - 64) : k])
+        return key is not None and not _COMMAND_KEY.fullmatch(key.group(1))
+    if k >= 0 and text[k] == "(":
+        p = k - 1
+        while p >= 0 and text[p] in " \t":
+            p -= 1
+        if p >= 0 and (text[p].isalnum() or text[p] in "_)]"):
+            return False  # an argument: `open("/etc/shadow")`, `run("curl", …)`
+    return _name_beside(text, open_q, close_q)
+
+
+def _table_row_bounds(
+    text: str, idx: int, code_spans: list[tuple[int, int]]
+) -> tuple[int, int] | None:
+    """(start, end) of the markdown table row holding ``idx``, or None when it is not in one."""
+    if _in_spans(idx, code_spans):
+        return None
+    lo = text.rfind("\n", 0, idx) + 1
+    hi = text.find("\n", idx)
+    hi = len(text) if hi < 0 else hi
+    return (lo, hi) if _TABLE_ROW.match(text, lo, hi) else None
 
 # Obfuscation: zero-width / bidirectional unicode that can hide instructions.
 # Bidi CONTROLS split by risk (2026-07-09 calibration):
@@ -323,6 +518,92 @@ _SSRF_METADATA: list[tuple[str, re.Pattern[str]]] = [
     ),
     ("process environ read", re.compile(r"/proc/(?:\d+|self)/environ\b")),
 ]
+
+# v7: naming a metadata ADDRESS is not always requesting it. Protective code names it: an SSRF
+# guard explains in a comment that link-local covers 169.254.169.254; a NetworkPolicy template
+# lists `169.254.169.254/32` under `except:`. Neither sends a request, and an agent acts on
+# neither.
+#
+# This is NOT a doc-context downgrade (none applies to this check, and that still holds: no
+# prose, category or file name softens a request). It reads the form of the match itself. A
+# mention is relieved to WARNING only when ALL hold:
+#   * it is an address, not a URL: no `scheme://` or `//` directly before it, and no `/path`
+#     or `:port` after it (a `/32`-style range suffix is not a path);
+#   * nothing on its line fetches anything (_FETCH_ON_LINE);
+#   * the text names none of the metadata API's own paths or headers (_METADATA_API) —
+#     `HOST = "169.254.169.254"` beside `requests.get(f"http://{HOST}/latest/meta-data/")` is
+#     a request split in two, and stays CRITICAL;
+#   * it is a network range; or, inside code (a fenced block, or a file the caller framed
+#     EXECUTABLE), it sits in a comment, or it is a quoted item in a list of other hosts —
+#     an SSRF guard's denylist, `{"localhost", "127.0.0.1", "metadata.google.internal"}`.
+#     A comment in markdown prose does not count: `<!-- -->` is hidden from a human reader
+#     and still read by an agent.
+# Prose that names the address stays CRITICAL — prose is where an agent takes instructions,
+# and an agent knows the metadata API's paths without being told them.
+_METADATA_API = re.compile(
+    r"(?i)/latest/(?:meta-data|user-data|dynamic|api/token)|/computeMetadata/|"
+    r"/metadata/(?:instance|identity|v1)\b|/openstack/latest\b|security-credentials|"
+    r"\bMetadata-Flavor\b|\bX-aws-ec2-metadata-token\b"
+)
+_FETCH_ON_LINE = re.compile(
+    r"(?i)\b(?:curl|wget|fetch|https?\.(?:get|request)|requests\.\w+|urllib\w*|urlopen|httpx|"
+    r"axios|invoke-webrequest|invoke-restmethod|iwr|irm|nc|ncat|telnet|socat|get|put|post)\b"
+)
+_URL_LEAD = re.compile(r"(?:[A-Za-z][\w+.\-]*:)?//[^\s/]*$")
+_RANGE_SUFFIX = re.compile(r"/\d{1,2}(?![\w./])")
+_COMMENT_LEAD = re.compile(r"(?:^|[\s;{}()])(?://|#)|^\s*(?:/\*|\*(?!\*))|(?:^|\s)--\s")
+# The caller's attachment separator (see _CALLER_FRAMING), read for its EXECUTABLE flag.
+_FRAME_HEADER = re.compile(r"(?m)^---\s*attachment:.*?---\s*$")
+
+
+def _metadata_address_mentioned(
+    text: str, match_start: int, match_end: int, code_spans: list[tuple[int, int]]
+) -> bool:
+    """True when a metadata-address match is a mention, not a request (rules above).
+
+    The caller has already checked that ``text`` names no metadata API path."""
+    lo = text.rfind("\n", 0, match_start) + 1
+    hi = text.find("\n", match_end)
+    hi = len(text) if hi < 0 else hi
+    before, after = text[lo:match_start], text[match_end:hi]
+    if _URL_LEAD.search(before):
+        return False
+    network_range = bool(_RANGE_SUFFIX.match(after))
+    if not network_range and after[:1] in ("/", ":"):
+        return False
+    if _FETCH_ON_LINE.search(text[lo:hi]):
+        return False
+    if network_range:
+        return True
+    if not _in_code(text, match_start, code_spans):
+        return False
+    return bool(_COMMENT_LEAD.search(before)) or _listed_host(text, match_start, match_end)
+
+
+# A host as a list item: a name, an IPv4 or bracketed IPv6 address, a CIDR range. Not a URL.
+_HOST_LITERAL = re.compile(r"[\w.:\[\]/\-]+")
+
+
+def _is_host(inner: str) -> bool:
+    return bool(_HOST_LITERAL.fullmatch(inner)) and "//" not in inner
+
+
+def _listed_host(text: str, match_start: int, match_end: int) -> bool:
+    """The match is a whole quoted item with another host right beside it: a denylist."""
+    i, j = match_start - 1, match_end
+    if i < 0 or j >= len(text) or text[i] not in _QUOTE_CHARS or text[j] != text[i]:
+        return False
+    return _name_beside(text, i, j, accept=_is_host)
+
+
+def _in_code(text: str, idx: int, code_spans: list[tuple[int, int]]) -> bool:
+    """Inside a fenced code block, or inside an attachment the caller framed EXECUTABLE."""
+    if _in_spans(idx, code_spans):
+        return True
+    header = None
+    for header in _FRAME_HEADER.finditer(text, 0, idx):
+        pass
+    return header is not None and " EXECUTABLE" in header.group(0)
 
 # Agent-config snooping — reading another agent's config / installed skills / MCP
 # manifest to exfiltrate or shadow them. WARNING, doc-downgradable.
@@ -488,7 +769,53 @@ def _looks_like_documentation(
     hi = min(len(text), match_start + 400)
     if _DOC_MARKERS.search(_strip_caller_framing(text[lo:hi])):
         return True
+    # v7: a reference document says what it is in its headings. A threat model's payload
+    # examples sit under "# Threat Model" / "## Known Attack Patterns", often further than 400
+    # characters from the words that introduce them.
+    if _DOC_MARKERS.search(_reference_section_headings(text, match_start, code_spans)):
+        return True
     return False
+
+
+# A markdown ATX heading. `#` lines inside fenced code are comments, and are skipped by the caller.
+_MD_HEADING = re.compile(r"(?m)^[ \t]{0,3}(#{1,6})[ \t]+(.+?)[ \t#]*$")
+_REFERENCE_DOC_SUFFIXES = (".md", ".markdown", ".mdx")
+
+
+def _reference_section_headings(text: str, idx: int, code_spans: list[tuple[int, int]]) -> str:
+    """The headings of every section enclosing ``idx`` — its title, its chapter, its section —
+    when ``idx`` lies in a markdown REFERENCE attachment; "" anywhere else.
+
+    v7. Bundled-file content had no way to earn doc context: the doc-marker window is ±400
+    characters, and a reference document introduces its examples in headings. A skill that
+    audits other skills ships `references/threat-model.md`, whose obfuscated-payload example
+    sits under "## Known Attack Patterns" in "# Threat Model: AI Agent Skills".
+
+    Scoped to what a reference document is. Not the SKILL.md body: that is the instruction
+    surface the agent follows, and its headings structure steps, not a subject. Not a file the
+    caller framed EXECUTABLE: a script's `#` lines are comments, and a script is run, not read.
+    Only `.md`/`.markdown`/`.mdx` files, and only headings outside fenced code. The headings
+    are evidence of the same strength as the window (author-written text, which downgrades a
+    CRITICAL to a WARNING and never clears it), and they never touch NON_DOWNGRADABLE_CHECKS,
+    which return before this is consulted.
+    """
+    header = None
+    for header in _FRAME_HEADER.finditer(text, 0, idx):
+        pass
+    if header is None or " EXECUTABLE" in header.group(0):
+        return ""
+    path = re.match(r"---\s*attachment:\s*(\S+)", header.group(0))
+    if not path or not path.group(1).lower().endswith(_REFERENCE_DOC_SUFFIXES):
+        return ""
+    chain: dict[int, str] = {}
+    for h in _MD_HEADING.finditer(text, header.end(), idx):
+        if _in_spans(h.start(), code_spans):
+            continue
+        level = len(h.group(1))
+        for deeper in [lvl for lvl in chain if lvl >= level]:
+            del chain[deeper]
+        chain[level] = h.group(2)
+    return "\n".join(chain[lvl] for lvl in sorted(chain))
 
 
 # Separator lines a caller wraps around content it did not author. Matched
@@ -828,7 +1155,31 @@ def scan_skill_content(
             if re.search(r"(?i)(?:-i|--identity|--key|identityfile|-CertificateFile)\s*$", prefix):
                 continue
             win_lo, win_hi = max(0, sm.start() - 200), min(len(text), sm.end() + 200)
-            if _EGRESS_SINK.search(text[win_lo:win_hi]):
+            row = _table_row_bounds(text, sm.start(), code_spans)
+            if row:
+                win_lo, win_hi = max(win_lo, row[0]), min(win_hi, row[1])
+            sinks = [
+                (win_lo + k.start(), win_lo + k.end())
+                for k in _EGRESS_SINK.finditer(text[win_lo:win_hi])
+            ]
+            if (
+                sinks
+                and _named_as_data(text, sm.start(), sm.end())
+                and all(_named_as_data(text, a, b) for a, b in sinks)
+            ):
+                findings.append(
+                    _finding(
+                        "data_exfiltration",
+                        INFO,
+                        "Names a sensitive file and a network tool only as data (items in a "
+                        "list, values in a record), with nothing that reads the one and sends "
+                        "it — recorded, not flagged.",
+                        evidence=sm.group(0),
+                        line=_line_of(text, sm.start()),
+                    )
+                )
+                continue
+            if sinks:
                 doc = _looks_like_documentation(
                     check="data_exfiltration", category=category, text=text,
                     match_start=sm.start(), code_spans=code_spans,
@@ -936,7 +1287,40 @@ def scan_skill_content(
         # (NON_DOWNGRADABLE_CHECKS). The caller's pre-execution denylist stays a separate
         # unconditional layer for executable bundles; this covers the skill body /
         # metadata / CLI surface.
-        _behavioral(_SSRF_METADATA, "ssrf_metadata", "Cloud metadata / SSRF")
+        #
+        # v7: a metadata ADDRESS named as a network range or in a code comment, with no
+        # request anywhere near it, is a mention: WARNING. See _metadata_address_mentioned.
+        # Every request, and every /proc/*/environ read, takes the path below unchanged.
+        names_metadata_api = bool(_METADATA_API.search(text))
+        for label, pat in _SSRF_METADATA:
+            for m in pat.finditer(text):
+                if (
+                    label == "cloud metadata endpoint"
+                    and not names_metadata_api
+                    and _metadata_address_mentioned(text, m.start(), m.end(), code_spans)
+                ):
+                    findings.append(
+                        _finding(
+                            "ssrf_metadata",
+                            WARNING,
+                            f"Names a cloud metadata address without requesting it ({label}: "
+                            "a network range, a code comment or a denylist entry, and nothing "
+                            "on the line fetches it) — recorded, not blocked.",
+                            evidence=m.group(0),
+                            line=_line_of(text, m.start()),
+                        )
+                    )
+                    continue
+                findings.append(
+                    _finding(
+                        "ssrf_metadata",
+                        CRITICAL,
+                        f"Cloud metadata / SSRF pattern ({label}) — a skill must not instruct "
+                        "an agent to do this.",
+                        evidence=m.group(0),
+                        line=_line_of(text, m.start()),
+                    )
+                )
 
         # Agent-config snooping — reading another agent's config / MCP manifest.
         for m in _AGENT_SNOOP.finditer(text):
