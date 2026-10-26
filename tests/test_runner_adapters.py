@@ -238,6 +238,32 @@ def test_openai_reasoning_models_omit_temperature(monkeypatch):
     assert payloads[2]["temperature"] == 0.0
 
 
+@pytest.mark.parametrize("model,temperature_sent", [
+    ("claude-haiku-4-5", True), ("claude-sonnet-4-6", True),
+    ("claude-haiku-4-5-20251001", True), ("claude-3-5-sonnet-20241022", True),
+    ("claude-opus-4-7", False), ("claude-opus-4-8", False), ("claude-haiku-5-5", False),
+    ("claude-sonnet-5-5", False), ("claude-opus-5-5", False), ("claude-latest", False),
+])
+def test_claude_models_past_4_6_omit_temperature(monkeypatch, model, temperature_sent):
+    """Opus 4.7+ and the 5.x line answer any temperature but 1.0 with a 400
+    (measured 2026-10-26); 4.6 and earlier still take one."""
+    import httpx
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "k")
+    payloads = []
+
+    def fake_post(url, **kw):
+        payloads.append(kw["json"])
+        return _FakeResponse(200, {
+            "content": [{"type": "text", "text": "ok"}],
+            "usage": {"input_tokens": 2, "output_tokens": 1},
+        })
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    assert LLMClient(model).complete("p", temperature=0.0).text == "ok"
+    assert ("temperature" in payloads[0]) is temperature_sent
+
+
 def test_exhausted_retries_raise_last_error(monkeypatch):
     import httpx
 

@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -39,6 +40,9 @@ DEFAULT_MAX_TOKENS = 4096
 
 _ANTHROPIC_VERSION = "2023-06-01"
 _OPENAI_PREFIXES = ("gpt", "o1", "o3", "o4", "chatgpt")
+# claude-sonnet-4-6, claude-haiku-4-5-20251001, claude-3-5-sonnet-20241022,
+# claude-opus-5-5. A minor must end at "-" or the ID, so a date is never one.
+_CLAUDE_VERSION = re.compile(r"claude-(?:[a-z]+-)?([0-9]+)(?:-([0-9]{1,2}))?(?:-|$)")
 
 # The answer is captured VERBATIM (no JSON envelope) so output-format skills show their
 # lift — wrapping would clean up the bare arm and mask exactly what such skills fix.
@@ -65,6 +69,21 @@ def _provider_for(model: str) -> str:
         f"cannot infer provider for model {model!r} — expected a name starting with "
         f"'claude' (Anthropic), {'/'.join(_OPENAI_PREFIXES)} (OpenAI), or 'gemini' (Google)"
     )
+
+
+def _anthropic_accepts_temperature(model: str) -> bool:
+    """Claude 4.6 and earlier take ``temperature``; later generations reject it.
+
+    Measured 2026-10-26: Opus 4.7, Haiku 5.5, Sonnet 5.5 and Opus 5.5 answer every
+    value except 1.0 with a 400 ("`temperature` is deprecated for this model");
+    Sonnet 4.6 and Haiku 4.5 take 0.0-1.0. An ID this can't place gets no
+    temperature, since the provider default is valid on every model. Same rule as
+    the platform backend's ``model_policy.anthropic_accepts_temperature``.
+    """
+    version = _CLAUDE_VERSION.match(model.lower())
+    if not version:
+        return False
+    return (int(version[1]), int(version[2] or 0)) <= (4, 6)
 
 
 def _body_snippet(response: Any, limit: int = 200) -> str:
@@ -197,6 +216,15 @@ class LLMClient:
     def _complete_anthropic(
         self, httpx: Any, key: str, prompt: str, temperature: float
     ) -> CompletionResult:
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "max_tokens": self.max_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        # Opus 4.7+ and the 5.x line reject a temperature (400), so they run at the
+        # provider default — a temperature-0 pin cannot apply to them.
+        if _anthropic_accepts_temperature(self.model):
+            payload["temperature"] = temperature
         resp = httpx.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -204,12 +232,7 @@ class LLMClient:
                 "anthropic-version": _ANTHROPIC_VERSION,
                 "content-type": "application/json",
             },
-            json={
-                "model": self.model,
-                "max_tokens": self.max_tokens,
-                "temperature": temperature,
-                "messages": [{"role": "user", "content": prompt}],
-            },
+            json=payload,
             timeout=self.timeout_s,
         )
         resp.raise_for_status()
