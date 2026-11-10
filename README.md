@@ -8,7 +8,7 @@
 [![Downloads](https://static.pepy.tech/badge/skillevaluation/month)](https://pepy.tech/project/skillevaluation)
 [![CI](https://img.shields.io/github/actions/workflow/status/decimal-labs/skillevaluation/ci.yml?branch=main)](https://github.com/decimal-labs/skillevaluation/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/skillevaluation/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://pypi.org/project/skillevaluation/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/decimal-labs/skillevaluation/blob/main/LICENSE)
 
 A skill is just a folder — a `SKILL.md` plus some attachments. It's easy to write one and *assume* it helps. `skillevaluation` lets you **measure** the help: write a small `eval.yaml` next to your skill, and a runner executes each test case twice — once with the skill loaded, once without — then hands you a clear A/B delta on pass rate, speed, tokens, turns, and tool calls.
 

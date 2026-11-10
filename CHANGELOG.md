@@ -4,6 +4,8 @@ All notable changes to `skillevaluation` are documented here. Format follows [Ke
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-11-10
+
 The safety scanner is version 8 (7 was never released). Defenders' files (detection rules,
 logged-event references, SSRF guards, network policies, threat models, security checklists) no
 longer block; every payload that blocked before still blocks.
